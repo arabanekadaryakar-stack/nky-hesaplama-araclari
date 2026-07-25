@@ -1,12 +1,150 @@
 <!doctype html>
 <html lang="tr">
 <head>
+<!-- NKY self-contained calculator build v4: vehicle catalogue and app code are embedded. -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b5cab">
   <title>Aylık Yakıt ve Elektrik Gideri Hesaplama</title>
   <meta name="description" content="Aracınızın aylık kilometre, ortalama tüketim ve güncel fiyatına göre aylık ve yıllık yakıt veya elektrik giderini hesaplayın.">
-  <link rel="stylesheet" href="../shared/styles.css">
+  <style>
+:root{
+  --nky-bg:#f4f7fb;--nky-card:#fff;--nky-text:#172033;--nky-muted:#667085;
+  --nky-primary:#0b5cab;--nky-primary-dark:#084781;--nky-soft:#eef6ff;
+  --nky-border:#d9e3ed;--nky-success:#08734f;--nky-success-bg:#ecfdf3;
+  --nky-warning:#7a4b00;--nky-warning-bg:#fff8e8;--nky-danger:#b42318;--nky-danger-bg:#fff1f1;
+  --nky-shadow:0 14px 38px rgba(15,33,61,.08);--nky-radius:18px;
+}
+*{box-sizing:border-box}
+html{color-scheme:light;scroll-behavior:smooth}
+body{margin:0;background:var(--nky-bg);color:var(--nky-text);font:16px/1.55 Arial,Helvetica,sans-serif;padding:0 0 48px}
+button,input,select,textarea{font:inherit}
+button{touch-action:manipulation}
+a{color:var(--nky-primary)}
+.nky-shell{width:min(1120px,calc(100% - 28px));margin:0 auto}
+.nky-topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--nky-border)}
+.nky-topbar-inner{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.nky-brand{font-weight:900;color:#173452;text-decoration:none;white-space:nowrap}
+.nky-nav{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:none}
+.nky-nav::-webkit-scrollbar{display:none}
+.nky-nav a{flex:0 0 auto;padding:8px 10px;border-radius:9px;color:#475467;text-decoration:none;font-size:12px;font-weight:800}
+.nky-nav a:hover,.nky-nav a.active{background:var(--nky-soft);color:var(--nky-primary)}
+.nky-hero{padding:28px 0 18px}
+.nky-kicker{display:inline-flex;padding:6px 10px;border-radius:999px;background:var(--nky-soft);color:var(--nky-primary);font-size:11px;font-weight:900}
+.nky-hero h1{margin:11px 0 7px;font-size:clamp(28px,5vw,42px);line-height:1.12;letter-spacing:-.7px}
+.nky-hero p{max-width:760px;margin:0;color:var(--nky-muted)}
+.nky-card{margin-bottom:18px;padding:22px;border:1px solid var(--nky-border);border-radius:var(--nky-radius);background:var(--nky-card);box-shadow:var(--nky-shadow)}
+.nky-card h2{margin:0 0 6px;color:#173452;font-size:23px}
+.nky-card-sub{margin:0 0 17px;color:var(--nky-muted);font-size:13px}
+.nky-grid{display:grid;gap:13px}
+.nky-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.nky-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.nky-grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.nky-field{display:flex;min-width:0;flex-direction:column;gap:6px}
+.nky-field.full{grid-column:1/-1}
+.nky-field label{color:#344054;font-size:12px;font-weight:900}
+.nky-field small{color:var(--nky-muted);font-weight:400}
+.nky-input-wrap{position:relative}
+.nky-input-wrap .nky-unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--nky-muted);font-size:11px;font-weight:800;pointer-events:none}
+input,select,textarea{width:100%;min-height:48px;padding:11px 12px;border:1px solid #cdd8e3;border-radius:11px;background:#fff;color:var(--nky-text);outline:0}
+input:focus,select:focus,textarea:focus{border-color:#78abd7;box-shadow:0 0 0 3px rgba(11,92,171,.10)}
+input[type=number]{font-variant-numeric:tabular-nums}
+.nky-button{min-height:48px;border:1px solid var(--nky-primary);border-radius:11px;padding:10px 15px;background:#fff;color:var(--nky-primary);font-weight:900;cursor:pointer}
+.nky-button:hover{background:var(--nky-soft)}
+.nky-button:active{transform:scale(.99)}
+.nky-button.primary{background:var(--nky-primary);color:#fff;box-shadow:0 8px 20px rgba(11,92,171,.18)}
+.nky-button.primary:hover{background:var(--nky-primary-dark)}
+.nky-button.danger{border-color:#efb7b7;color:var(--nky-danger)}
+.nky-button:disabled{opacity:.5;cursor:not-allowed}
+.nky-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.nky-actions .primary{flex:1 1 260px}
+.nky-status{margin-top:12px;padding:11px 12px;border:1px solid var(--nky-border);border-radius:11px;background:#f8fafc;color:var(--nky-muted);font-size:12px;line-height:1.5}
+.nky-status.ok{border-color:#afe1c8;background:var(--nky-success-bg);color:var(--nky-success)}
+.nky-status.warn{border-color:#f0ca7d;background:var(--nky-warning-bg);color:var(--nky-warning)}
+.nky-status.error{border-color:#efb8b8;background:var(--nky-danger-bg);color:var(--nky-danger)}
+.nky-autocomplete{position:relative}
+.nky-suggestions{display:none;position:absolute;z-index:100;left:0;right:0;top:calc(100% + 5px);max-height:310px;overflow:auto;padding:6px;border:1px solid #c8d7e5;border-radius:13px;background:#fff;box-shadow:0 18px 44px rgba(15,33,61,.18)}
+.nky-suggestions.show{display:block}
+.nky-suggestion{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:55px;padding:10px 11px;border:0;border-radius:9px;background:#fff;text-align:left;cursor:pointer}
+.nky-suggestion:hover,.nky-suggestion.active{background:#eef6ff}
+.nky-suggestion-main{min-width:0}
+.nky-suggestion strong{display:block;overflow:hidden;color:#173452;font-size:14px;text-overflow:ellipsis;white-space:nowrap}
+.nky-suggestion small{display:block;margin-top:3px;color:var(--nky-muted);font-size:11px}
+.nky-badge{flex:0 0 auto;padding:5px 8px;border-radius:999px;background:var(--nky-soft);color:var(--nky-primary);font-size:10px;font-weight:900}
+.nky-selected{margin-top:9px;min-height:42px;padding:10px 12px;border:1px solid var(--nky-border);border-radius:10px;background:#f8fafc;color:var(--nky-muted);font-size:12px}
+.nky-selected.ok{border-color:#afe1c8;background:var(--nky-success-bg);color:var(--nky-success);font-weight:800}
+.nky-inline-check{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid var(--nky-border);border-radius:11px;background:#f8fafc}
+.nky-inline-check input{width:auto;min-height:auto;margin-top:3px;accent-color:var(--nky-primary)}
+.nky-inline-check label{font-size:13px;font-weight:800}
+.nky-collapsible{margin-top:13px;border:1px solid var(--nky-border);border-radius:12px;background:#f8fafc;overflow:hidden}
+.nky-collapsible summary{padding:13px 14px;cursor:pointer;font-weight:900;color:#173452}
+.nky-collapsible-body{padding:0 14px 14px}
+.nky-result{display:none;margin-top:18px;padding:18px;border:1px solid #b8d8f3;border-radius:15px;background:#eff8ff}
+.nky-result.show{display:block;animation:nkyIn .2s ease}
+@keyframes nkyIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.nky-result-title{color:#52677d;font-size:12px;font-weight:800}
+.nky-result-total{margin-top:2px;color:var(--nky-primary);font-size:clamp(31px,6vw,44px);font-weight:900;line-height:1.1;letter-spacing:-.8px}
+.nky-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.nky-metric{padding:11px;border:1px solid #cfe4fb;border-radius:11px;background:#fff}
+.nky-metric small{display:block;color:var(--nky-muted);font-size:10px}
+.nky-metric strong{display:block;margin-top:4px;overflow-wrap:anywhere;font-size:14px}
+.nky-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:16px 0;padding:4px;border:1px solid var(--nky-border);border-radius:12px;background:#f4f8fc}
+.nky-tab{border:0;border-radius:9px;padding:10px 8px;background:transparent;color:var(--nky-muted);font-weight:900;cursor:pointer}
+.nky-tab.active{background:#fff;color:var(--nky-primary);box-shadow:0 4px 12px rgba(15,33,61,.08)}
+.nky-panel{display:none}.nky-panel.active{display:block}
+.nky-two-vehicles{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:14px;align-items:stretch}
+.nky-vehicle-card{padding:16px;border:1px solid var(--nky-border);border-radius:15px;background:#fbfdff}
+.nky-vs{align-self:center;justify-self:center;display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--nky-primary);color:#fff;font-weight:900}
+.nky-winner{margin-bottom:12px;padding:13px 14px;border:1px solid #a7e0c4;border-radius:12px;background:var(--nky-success-bg);color:var(--nky-success);font-weight:900}
+.nky-result-card{position:relative;padding:16px;border:1px solid var(--nky-border);border-radius:14px;background:#fff}
+.nky-result-card.cheaper{border-color:#77d3a5;box-shadow:0 0 0 3px rgba(35,180,105,.08)}
+.nky-result-card>small{display:block;color:var(--nky-primary);font-weight:900}
+.nky-result-card>strong{display:block;margin:7px 0 3px;font-size:31px}
+.nky-result-card dl{margin:12px 0 0}.nky-result-card dl div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid #edf1f5}.nky-result-card dt,.nky-result-card dd{margin:0}.nky-result-card dd{font-weight:800}
+.nky-info{margin-top:18px;padding:19px;border:1px solid var(--nky-border);border-radius:15px;background:#fff}
+.nky-info h2{margin:0 0 10px;font-size:21px}.nky-info h3{margin:22px 0 7px;font-size:17px}.nky-info p,.nky-info li{color:#475467;font-size:14px;line-height:1.7}.nky-info ul{padding-left:20px}
+.nky-footer-note{margin-top:18px;color:var(--nky-muted);font-size:11px;text-align:center}
+.nky-hidden{display:none!important}
+@media(max-width:820px){
+  .nky-grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nky-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nky-two-vehicles{grid-template-columns:1fr}
+  .nky-vs{width:42px;height:42px}
+}
+@media(max-width:640px){
+  body{padding-bottom:30px}
+  .nky-shell{width:min(100% - 18px,1120px)}
+  .nky-topbar-inner{min-height:52px}
+  .nky-brand{font-size:14px}
+  .nky-nav a{padding:7px 8px;font-size:10px}
+  .nky-hero{padding:18px 0 12px}.nky-hero h1{font-size:29px}.nky-hero p{font-size:13px}
+  .nky-card{padding:13px;border-radius:15px}.nky-card h2{font-size:20px}
+  .nky-grid-2,.nky-grid-3,.nky-grid-4{grid-template-columns:1fr}
+  .nky-field.full{grid-column:auto}
+  input,select,textarea,button{font-size:16px}
+  .nky-actions{display:grid;grid-template-columns:1fr}.nky-actions .primary{flex:auto}
+  .nky-tabs{grid-template-columns:1fr}
+  .nky-metrics{grid-template-columns:1fr 1fr}
+  .nky-suggestions{position:fixed;left:8px;right:8px;top:auto;bottom:8px;max-height:55vh;border-radius:16px;box-shadow:0 -18px 55px rgba(15,33,61,.25)}
+  .nky-suggestion{min-height:60px}
+  .nky-result{padding:13px}.nky-result-card>strong{font-size:27px}
+  .nky-info{padding:15px}
+}
+
+
+/* v4: araç seçimi için her zaman görünen güvenilir yerel liste */
+.nky-native-vehicle-wrap{margin-top:9px;padding:10px;border:1px solid #d8e4ef;border-radius:11px;background:#f8fbff}
+.nky-native-vehicle-label{display:block;margin-bottom:6px;color:#52677d;font-size:11px;font-weight:900}
+.nky-native-vehicle-select{min-height:46px;background:#fff;color:#173452;font-weight:700}
+.nky-native-vehicle-select:focus{border-color:#78abd7;box-shadow:0 0 0 3px rgba(11,92,171,.10)}
+@media(max-width:640px){
+  .nky-native-vehicle-wrap{padding:8px;margin-top:8px}
+  .nky-native-vehicle-label{font-size:10px}
+  .nky-native-vehicle-select{font-size:16px;min-height:48px}
+}
+
+</style>
 <meta name="robots" content="noindex,follow">
 <link rel="canonical" href="https://www.arabanekadaryakar.com/p/aylk-yakt-gideri-hesaplama.html">
 </head>
@@ -75,8 +213,481 @@
   </section>
   <p class="nky-footer-note">Vergi, bakım, sigorta, otopark ve araç finansmanı bu hesapta yer almaz.</p>
 </main>
-<script src="../shared/turkiye-lokasyonlari.js"></script>
-<script src="../shared/core.js"></script>
-<script src="./app.js"></script>
+<script>
+window.NKY_LOCATIONS = {
+  cities: ['Adana','Adıyaman','Afyonkarahisar','Ağrı','Aksaray','Amasya','Ankara','Antalya','Ardahan','Artvin','Aydın','Balıkesir','Bartın','Batman','Bayburt','Bilecik','Bingöl','Bitlis','Bolu','Burdur','Bursa','Çanakkale','Çankırı','Çorum','Denizli','Diyarbakır','Düzce','Edirne','Elazığ','Erzincan','Erzurum','Eskişehir','Gaziantep','Giresun','Gümüşhane','Hakkari','Hatay','Iğdır','Isparta','İstanbul','İzmir','Kahramanmaraş','Karabük','Karaman','Kars','Kastamonu','Kayseri','Kırıkkale','Kırklareli','Kırşehir','Kilis','Kocaeli','Konya','Kütahya','Malatya','Manisa','Mardin','Mersin','Muğla','Muş','Nevşehir','Niğde','Ordu','Osmaniye','Rize','Sakarya','Samsun','Siirt','Sinop','Sivas','Şanlıurfa','Şırnak','Tekirdağ','Tokat','Trabzon','Tunceli','Uşak','Van','Yalova','Yozgat','Zonguldak'],
+  districts: {"Balıkesir":["Altıeylül","Ayvalık","Balya","Bandırma","Bigadiç","Burhaniye","Dursunbey","Edremit","Erdek","Gömeç","Gönen","Havran","İvrindi","Karesi","Kepsut","Manyas","Marmara","Savaştepe","Sındırgı","Susurluk"],"Bilecik":["Bozüyük","Gölpazarı","İnhisar","Merkez","Osmaneli","Pazaryeri","Söğüt","Yenipazar"],"Bingöl":["Adaklı","Genç","Karlıova","Kiğı","Merkez","Solhan","Yayladere","Yedisu"],"Bitlis":["Adilcevaz","Ahlat","Güroymak","Hizan","Merkez","Mutki","Tatvan"],"Bolu":["Dörtdivan","Gerede","Göynük","Kıbrıscık","Mengen","Merkez","Mudurnu","Seben","Yeniçağa"],"Burdur":["Ağlasun","Altınyayla","Bucak","Çavdır","Çeltikçi","Gölhisar","Karamanlı","Kemer","Merkez","Tefenni","Yeşilova"],"Bursa":["Büyükorhan","Gemlik","Gürsu","Harmancık","İnegöl","İznik","Karacabey","Keles","Kestel","Mudanya","Mustafakemalpaşa","Nilüfer","Orhaneli","Orhangazi","Osmangazi","Yenişehir","Yıldırım"],"Çanakkale":["Ayvacık","Bayramiç","Biga","Bozcaada","Çan","Eceabat","Ezine","Gelibolu","Gökçeada","Lapseki","Merkez","Yenice"],"Çankırı":["Atkaracalar","Bayramören","Çerkeş","Eldivan","Ilgaz","Kızılırmak","Korgun","Kurşunlu","Merkez","Orta","Şabanözü","Yapraklı"],"Çorum":["Alaca","Bayat","Boğazkale","Dodurga","İskilip","Kargı","Laçin","Mecitözü","Merkez","Oğuzlar","Ortaköy","Osmancık","Sungurlu","Uğurludağ"],"Denizli":["Acıpayam","Babadağ","Baklan","Bekilli","Beyağaç","Bozkurt","Buldan","Çal","Çameli","Çardak","Çivril","Güney","Honaz","Kale","Merkezefendi","Pamukkale","Sarayköy","Serinhisar","Tavas"],"Diyarbakır":["Bağlar","Bismil","Çermik","Çınar","Çüngüş","Dicle","Eğil","Ergani","Hani","Hazro","Kayapınar","Kocaköy","Kulp","Lice","Silvan","Sur","Yenişehir"],"Edirne":["Enez","Havsa","İpsala","Keşan","Lalapaşa","Meriç","Merkez","Süloğlu","Uzunköprü"],"Elazığ":["Ağın","Alacakaya","Arıcak","Baskil","Karakoçan","Keban","Kovancılar","Maden","Merkez","Palu","Sivrice"],"Erzincan":["Çayırlı","İliç","Kemah","Kemaliye","Merkez","Otlukbeli","Refahiye","Tercan","Üzümlü"],"Erzurum":["Aşkale","Aziziye","Çat","Hınıs","Horasan","İspir","Karaçoban","Karayazı","Köprüköy","Narman","Oltu","Olur","Palandöken","Pasinler","Pazaryolu","Şenkaya","Tekman","Tortum","Uzundere","Yakutiye"],"Eskişehir":["Alpu","Beylikova","Çifteler","Günyüzü","Han","İnönü","Mahmudiye","Mihalgazi","Mihalıççık","Odunpazarı","Sarıcakaya","Seyitgazi","Sivrihisar","Tepebaşı"],"Gaziantep":["Araban","İslahiye","Karkamış","Nizip","Nurdağı","Oğuzeli","Şahinbey","Şehitkamil","Yavuzeli"],"Giresun":["Alucra","Bulancak","Çamoluk","Çanakçı","Dereli","Doğankent","Espiye","Eynesil","Görele","Güce","Keşap","Merkez","Piraziz","Şebinkarahisar","Tirebolu","Yağlıdere"],"Gümüşhane":["Kelkit","Köse","Kürtün","Merkez","Şiran","Torul"],"Hakkari":["Çukurca","Derecik","Merkez","Şemdinli","Yüksekova"],"Hatay":["Altınözü","Antakya","Arsuz","Belen","Defne","Dörtyol","Erzin","Hassa","İskenderun","Kırıkhan","Kumlu","Payas","Reyhanlı","Samandağ","Yayladağı"],"Isparta":["Aksu","Atabey","Eğirdir","Gelendost","Gönen","Keçiborlu","Merkez","Senirkent","Sütçüler","Şarkikaraağaç","Uluborlu","Yalvaç","Yenişarbademli"],"Mersin":["Akdeniz","Anamur","Aydıncık","Bozyazı","Çamlıyayla","Erdemli","Gülnar","Mezitli","Mut","Silifke","Tarsus","Toroslar","Yenişehir"],"İstanbul":["Adalar","Arnavutköy","Ataşehir","Avcılar","Bağcılar","Bahçelievler","Bakırköy","Başakşehir","Bayrampaşa","Beşiktaş","Beykoz","Beylikdüzü","Beyoğlu","Büyükçekmece","Çatalca","Çekmeköy","Esenler","Esenyurt","Eyüpsultan","Fatih","Gaziosmanpaşa","Güngören","Kadıköy","Kağıthane","Kartal","Küçükçekmece","Maltepe","Pendik","Sancaktepe","Sarıyer","Silivri","Sultanbeyli","Sultangazi","Şile","Şişli","Tuzla","Ümraniye","Üsküdar","Zeytinburnu"],"İzmir":["Aliağa","Balçova","Bayındır","Bayraklı","Bergama","Beydağ","Bornova","Buca","Çeşme","Çiğli","Dikili","Foça","Gaziemir","Güzelbahçe","Karabağlar","Karaburun","Karşıyaka","Kemalpaşa","Kınık","Kiraz","Konak","Menderes","Menemen","Narlıdere","Ödemiş","Seferihisar","Selçuk","Tire","Torbalı","Urla"],"Kars":["Akyaka","Arpaçay","Digor","Kağızman","Merkez","Sarıkamış","Selim","Susuz"],"Kastamonu":["Abana","Ağlı","Araç","Azdavay","Bozkurt","Cide","Çatalzeytin","Daday","Devrekani","Doğanyurt","Hanönü","İhsangazi","İnebolu","Küre","Merkez","Pınarbaşı","Seydiler","Şenpazar","Taşköprü","Tosya"],"Kayseri":["Akkışla","Bünyan","Develi","Felahiye","Hacılar","İncesu","Kocasinan","Melikgazi","Özvatan","Pınarbaşı","Sarıoğlan","Sarız","Talas","Tomarza","Yahyalı","Yeşilhisar"],"Kırklareli":["Babaeski","Demirköy","Kofçaz","Lüleburgaz","Merkez","Pehlivanköy","Pınarhisar","Vize"],"Kırşehir":["Akçakent","Akpınar","Boztepe","Çiçekdağı","Kaman","Merkez","Mucur"],"Kocaeli":["Başiskele","Çayırova","Darıca","Derince","Dilovası","Gebze","Gölcük","İzmit","Kandıra","Karamürsel","Kartepe","Körfez"],"Konya":["Ahırlı","Akören","Akşehir","Altınekin","Beyşehir","Bozkır","Cihanbeyli","Çeltik","Çumra","Derbent","Derebucak","Doğanhisar","Emirgazi","Ereğli","Güneysınır","Hadim","Halkapınar","Hüyük","Ilgın","Kadınhanı","Karapınar","Karatay","Kulu","Meram","Sarayönü","Selçuklu","Seydişehir","Taşkent","Tuzlukçu","Yalıhüyük","Yunak"],"Kütahya":["Altıntaş","Aslanapa","Çavdarhisar","Domaniç","Dumlupınar","Emet","Gediz","Hisarcık","Merkez","Pazarlar","Simav","Şaphane","Tavşanlı"],"Malatya":["Akçadağ","Arapgir","Arguvan","Battalgazi","Darende","Doğanşehir","Doğanyol","Hekimhan","Kale","Kuluncak","Pütürge","Yazıhan","Yeşilyurt"],"Manisa":["Ahmetli","Akhisar","Alaşehir","Demirci","Gölmarmara","Gördes","Kırkağaç","Köprübaşı","Kula","Salihli","Sarıgöl","Saruhanlı","Selendi","Soma","Şehzadeler","Turgutlu","Yunusemre"],"Kahramanmaraş":["Afşin","Andırın","Çağlayancerit","Dulkadiroğlu","Ekinözü","Elbistan","Göksun","Nurhak","Onikişubat","Pazarcık","Türkoğlu"],"Mardin":["Artuklu","Dargeçit","Derik","Kızıltepe","Mazıdağı","Midyat","Nusaybin","Ömerli","Savur","Yeşilli"],"Muğla":["Bodrum","Dalaman","Datça","Fethiye","Kavaklıdere","Köyceğiz","Marmaris","Menteşe","Milas","Ortaca","Seydikemer","Ula","Yatağan"],"Muş":["Bulanık","Hasköy","Korkut","Malazgirt","Merkez","Varto"],"Nevşehir":["Acıgöl","Avanos","Derinkuyu","Gülşehir","Hacıbektaş","Kozaklı","Merkez","Ürgüp"],"Niğde":["Altunhisar","Bor","Çamardı","Çiftlik","Merkez","Ulukışla"],"Ordu":["Akkuş","Altınordu","Aybastı","Çamaş","Çatalpınar","Çaybaşı","Fatsa","Gölköy","Gülyalı","Gürgentepe","İkizce","Kabadüz","Kabataş","Korgan","Kumru","Mesudiye","Perşembe","Ulubey","Ünye"],"Rize":["Ardeşen","Çamlıhemşin","Çayeli","Derepazarı","Fındıklı","Güneysu","Hemşin","İkizdere","İyidere","Kalkandere","Merkez","Pazar"],"Sakarya":["Adapazarı","Akyazı","Arifiye","Erenler","Ferizli","Geyve","Hendek","Karapürçek","Karasu","Kaynarca","Kocaali","Pamukova","Sapanca","Serdivan","Söğütlü","Taraklı"],"Samsun":["19 Mayıs","Alaçam","Asarcık","Atakum","Ayvacık","Bafra","Canik","Çarşamba","Havza","İlkadım","Kavak","Ladik","Salıpazarı","Tekkeköy","Terme","Vezirköprü","Yakakent"],"Siirt":["Baykan","Eruh","Kurtalan","Merkez","Pervari","Şirvan","Tillo"],"Sinop":["Ayancık","Boyabat","Dikmen","Durağan","Erfelek","Gerze","Merkez","Saraydüzü","Türkeli"],"Sivas":["Akıncılar","Altınyayla","Divriği","Doğanşar","Gemerek","Gölova","Gürün","Hafik","İmranlı","Kangal","Koyulhisar","Merkez","Suşehri","Şarkışla","Ulaş","Yıldızeli","Zara"],"Tekirdağ":["Çerkezköy","Çorlu","Ergene","Hayrabolu","Kapaklı","Malkara","Marmaraereğlisi","Muratlı","Saray","Süleymanpaşa","Şarköy"],"Tokat":["Almus","Artova","Başçiftlik","Erbaa","Merkez","Niksar","Pazar","Reşadiye","Sulusaray","Turhal","Yeşilyurt","Zile"],"Trabzon":["Akçaabat","Araklı","Arsin","Beşikdüzü","Çarşıbaşı","Çaykara","Dernekpazarı","Düzköy","Hayrat","Köprübaşı","Maçka","Of","Ortahisar","Sürmene","Şalpazarı","Tonya","Vakfıkebir","Yomra"],"Tunceli":["Çemişgezek","Hozat","Mazgirt","Merkez","Nazımiye","Ovacık","Pertek","Pülümür"],"Şanlıurfa":["Akçakale","Birecik","Bozova","Ceylanpınar","Eyyübiye","Halfeti","Haliliye","Harran","Hilvan","Karaköprü","Siverek","Suruç","Viranşehir"],"Uşak":["Banaz","Eşme","Karahallı","Merkez","Sivaslı","Ulubey"],"Van":["Bahçesaray","Başkale","Çaldıran","Çatak","Edremit","Erciş","Gevaş","Gürpınar","İpekyolu","Muradiye","Özalp","Saray","Tuşba"],"Yozgat":["Akdağmadeni","Aydıncık","Boğazlıyan","Çandır","Çayıralan","Çekerek","Kadışehri","Merkez","Saraykent","Sarıkaya","Sorgun","Şefaatli","Yenifakılı","Yerköy"],"Zonguldak":["Alaplı","Çaycuma","Devrek","Ereğli","Gökçebey","Kilimli","Kozlu","Merkez"],"Aksaray":["Ağaçören","Eskil","Gülağaç","Güzelyurt","Merkez","Ortaköy","Sarıyahşi","Sultanhanı"],"Bayburt":["Aydıntepe","Demirözü","Merkez"],"Karaman":["Ayrancı","Başyayla","Ermenek","Kazımkarabekir","Merkez","Sarıveliler"],"Kırıkkale":["Bahşılı","Balışeyh","Çelebi","Delice","Karakeçili","Keskin","Merkez","Sulakyurt","Yahşihan"],"Batman":["Beşiri","Gercüş","Hasankeyf","Kozluk","Merkez","Sason"],"Şırnak":["Beytüşşebap","Cizre","Güçlükonak","İdil","Merkez","Silopi","Uludere"],"Bartın":["Amasra","Kurucaşile","Merkez","Ulus"],"Ardahan":["Çıldır","Damal","Göle","Hanak","Merkez","Posof"],"Iğdır":["Aralık","Karakoyunlu","Merkez","Tuzluca"],"Yalova":["Altınova","Armutlu","Çınarcık","Çiftlikköy","Merkez","Termal"],"Karabük":["Eflani","Eskipazar","Merkez","Ovacık","Safranbolu","Yenice"],"Kilis":["Elbeyli","Merkez","Musabeyli","Polateli"],"Osmaniye":["Bahçe","Düziçi","Hasanbeyli","Kadirli","Merkez","Sumbas","Toprakkale"],"Düzce":["Akçakoca","Cumayeri","Çilimli","Gölyaka","Gümüşova","Kaynaşlı","Merkez","Yığılca"],"Adana":["Aladağ","Ceyhan","Çukurova","Feke","İmamoğlu","Karaisalı","Karataş","Kozan","Pozantı","Saimbeyli","Sarıçam","Seyhan","Tufanbeyli","Yumurtalık","Yüreğir"],"Adıyaman":["Besni","Çelikhan","Gerger","Gölbaşı","Kahta","Merkez","Samsat","Sincik","Tut"],"Afyonkarahisar":["Başmakçı","Bayat","Bolvadin","Çay","Çobanlar","Dazkırı","Dinar","Emirdağ","Evciler","Hocalar","İhsaniye","İscehisar","Kızılören","Merkez","Sandıklı","Sinanpaşa","Sultandağı","Şuhut"],"Ağrı":["Diyadin","Doğubayazıt","Eleşkirt","Hamur","Merkez","Patnos","Taşlıçay","Tutak"],"Amasya":["Göynücek","Gümüşhacıköy","Hamamözü","Merkez","Merzifon","Suluova","Taşova"],"Ankara":["Akyurt","Altındağ","Ayaş","Bala","Beypazarı","Çamlıdere","Çankaya","Çubuk","Elmadağ","Etimesgut","Evren","Gölbaşı","Güdül","Haymana","Kahramankazan","Kalecik","Keçiören","Kızılcahamam","Mamak","Nallıhan","Polatlı","Pursaklar","Sincan","Şereflikoçhisar","Yenimahalle"],"Antalya":["Akseki","Aksu","Alanya","Demre","Döşemealtı","Elmalı","Finike","Gazipaşa","Gündoğmuş","İbradı","Kaş","Kemer","Kepez","Konyaaltı","Korkuteli","Kumluca","Manavgat","Muratpaşa","Serik"],"Artvin":["Ardanuç","Arhavi","Borçka","Hopa","Kemalpaşa","Merkez","Murgul","Şavşat","Yusufeli"],"Aydın":["Bozdoğan","Buharkent","Çine","Didim","Efeler","Germencik","İncirliova","Karacasu","Karpuzlu","Koçarlı","Köşk","Kuşadası","Kuyucak","Nazilli","Söke","Sultanhisar","Yenipazar"]}
+};
+
+</script>
+<script>
+(function(global){
+  'use strict';
+
+  const VEHICLE_API='https://script.google.com/macros/s/AKfycbxNwL7NGF9eTBJApiu3PTIKHfPDt7wjmEg9rThG3fcVLdhkDaZWvmc2QDII4VcXONWAnQ/exec';
+  const PRICE_API='https://script.google.com/macros/s/AKfycbwJ2dzHkJRgvW2d9D_inYkYVi9s0wnZlEysyomC9W5BZ7W63nhgkHpL22QoP5-A6tMoyA/exec';
+  const CLIENT='nky-web-2026';
+  const SITE='arabanekadaryakar.com';
+  const CACHE_TTL=10*60*1000;
+
+  const fallbackVehicleMap={"Alfa Romeo":[{"name":"Giulietta 1.4 TB Benzin","type":"benzin","cons":7.0},{"name":"Tonale 1.5 Hybrid","type":"hibrit","cons":5.9}],"Audi":[{"name":"A3 35 TFSI Benzin","type":"benzin","cons":6.0},{"name":"A4 40 TDI Dizel","type":"dizel","cons":5.2},{"name":"Q3 35 TFSI Benzin","type":"benzin","cons":6.8}],"BMW":[{"name":"116i Benzin","type":"benzin","cons":6.3},{"name":"320i Benzin","type":"benzin","cons":6.5},{"name":"320d Dizel","type":"dizel","cons":5.0},{"name":"iX1 Elektrikli","type":"elektrik","cons":17.2}],"BYD":[{"name":"Dolphin Elektrikli","type":"elektrik","cons":15.9},{"name":"Atto 3 Elektrikli","type":"elektrik","cons":16.0},{"name":"Seal U DM-i Hibrit","type":"hibrit","cons":5.8},{"name":"Seal U EV Elektrikli","type":"elektrik","cons":19.9}],"Chery":[{"name":"Omoda 5 Pro 1.6 TGDI Benzin","type":"benzin","cons":9.1},{"name":"Tiggo 7 Pro Max 1.6 TGDI Benzin","type":"benzin","cons":7.9},{"name":"Tiggo 8 Pro Max 1.6 TGDI Benzin","type":"benzin","cons":8.6}],"Citroen":[{"name":"C3 1.2 PureTech Benzin","type":"benzin","cons":5.7},{"name":"C4 1.2 PureTech Benzin","type":"benzin","cons":5.8},{"name":"C4 X 1.5 BlueHDi Dizel","type":"dizel","cons":4.8}],"Cupra":[{"name":"Formentor 1.5 TSI Benzin","type":"benzin","cons":6.8},{"name":"Born Elektrikli","type":"elektrik","cons":16.8}],"Dacia":[{"name":"Sandero 1.0 TCe Benzin","type":"benzin","cons":6.0},{"name":"Duster 1.3 TCe Benzin","type":"benzin","cons":7.0},{"name":"Duster ECO-G LPG","type":"lpg","cons":8.1},{"name":"Jogger ECO-G LPG","type":"lpg","cons":8.4}],"DS":[{"name":"DS 4 PureTech Benzin","type":"benzin","cons":6.5},{"name":"DS 7 BlueHDi Dizel","type":"dizel","cons":5.5}],"Fiat":[{"name":"Egea 1.4 Fire Benzin","type":"benzin","cons":7.1},{"name":"Egea 1.6 Multijet Dizel","type":"dizel","cons":4.8},{"name":"Egea 1.4 Fire LPG","type":"lpg","cons":9.0},{"name":"500e Elektrikli","type":"elektrik","cons":14.0},{"name":"Fiorino 1.3 Multijet Dizel","type":"dizel","cons":5.2}],"Ford":[{"name":"Focus 1.5 EcoBlue Dizel","type":"dizel","cons":4.7},{"name":"Focus 1.0 EcoBoost Benzin","type":"benzin","cons":5.8},{"name":"Puma 1.0 EcoBoost Hybrid","type":"hibrit","cons":5.6},{"name":"Kuga 1.5 EcoBoost Benzin","type":"benzin","cons":7.2}],"Honda":[{"name":"Civic 1.5 VTEC Turbo Benzin","type":"benzin","cons":7.0},{"name":"Civic e:HEV Hybrid","type":"hibrit","cons":5.0},{"name":"HR-V e:HEV Hybrid","type":"hibrit","cons":5.4}],"Hyundai":[{"name":"i10 1.0 Benzin","type":"benzin","cons":5.5},{"name":"i20 1.0 T-GDI Benzin","type":"benzin","cons":6.0},{"name":"Bayon 1.0 T-GDI Benzin","type":"benzin","cons":6.2},{"name":"Tucson 1.6 T-GDI Hybrid","type":"hibrit","cons":6.0},{"name":"IONIQ 5 Elektrikli","type":"elektrik","cons":18.1},{"name":"Kona Elektrikli","type":"elektrik","cons":14.7}],"Jeep":[{"name":"Renegade 1.5 e-Hybrid","type":"hibrit","cons":5.8},{"name":"Compass 1.5 e-Hybrid","type":"hibrit","cons":6.0}],"Kia":[{"name":"Picanto 1.0 Benzin","type":"benzin","cons":5.4},{"name":"Stonic 1.0 T-GDI Benzin","type":"benzin","cons":5.9},{"name":"Sportage 1.6 T-GDI Hybrid","type":"hibrit","cons":6.1},{"name":"Niro EV Elektrikli","type":"elektrik","cons":16.2},{"name":"EV3 Elektrikli","type":"elektrik","cons":15.8}],"Mercedes-Benz":[{"name":"A 200 Benzin","type":"benzin","cons":6.4},{"name":"C 200 Benzin","type":"benzin","cons":6.7},{"name":"E 220 d Dizel","type":"dizel","cons":5.2},{"name":"EQA 250+ Elektrikli","type":"elektrik","cons":16.1}],"MG":[{"name":"MG4 Elektrikli","type":"elektrik","cons":16.6},{"name":"ZS 1.0 T-GDI Benzin","type":"benzin","cons":6.7},{"name":"HS PHEV Hibrit","type":"hibrit","cons":6.2}],"Mini":[{"name":"Cooper C Benzin","type":"benzin","cons":6.0},{"name":"Cooper Electric","type":"elektrik","cons":14.7}],"Nissan":[{"name":"Juke 1.0 DIG-T Benzin","type":"benzin","cons":6.0},{"name":"Qashqai e-Power Hybrid","type":"hibrit","cons":5.4},{"name":"X-Trail e-Power Hybrid","type":"hibrit","cons":6.2}],"Opel":[{"name":"Corsa 1.2 Benzin","type":"benzin","cons":5.4},{"name":"Astra 1.2 Turbo Benzin","type":"benzin","cons":5.8},{"name":"Mokka 1.2 Turbo Benzin","type":"benzin","cons":6.0},{"name":"Corsa-e Elektrikli","type":"elektrik","cons":15.8}],"Peugeot":[{"name":"208 1.2 PureTech Benzin","type":"benzin","cons":5.6},{"name":"2008 1.2 PureTech Benzin","type":"benzin","cons":6.1},{"name":"308 1.2 PureTech Benzin","type":"benzin","cons":5.8},{"name":"3008 1.5 BlueHDi Dizel","type":"dizel","cons":5.1},{"name":"e-2008 Elektrikli","type":"elektrik","cons":16.2}],"Renault":[{"name":"Clio 1.0 TCe Benzin","type":"benzin","cons":6.2},{"name":"Clio 1.5 Blue dCi Dizel","type":"dizel","cons":4.3},{"name":"Megane 1.3 TCe Benzin","type":"benzin","cons":6.7},{"name":"Captur E-Tech Hybrid","type":"hibrit","cons":5.0},{"name":"Austral E-Tech Hybrid","type":"hibrit","cons":5.2},{"name":"Megane E-Tech Elektrikli","type":"elektrik","cons":16.1}],"Seat":[{"name":"Ibiza 1.0 TSI Benzin","type":"benzin","cons":5.4},{"name":"Leon 1.5 eTSI Hybrid","type":"hibrit","cons":5.7},{"name":"Ateca 1.5 TSI Benzin","type":"benzin","cons":6.7}],"Skoda":[{"name":"Fabia 1.0 TSI Benzin","type":"benzin","cons":5.3},{"name":"Scala 1.0 TSI Benzin","type":"benzin","cons":5.5},{"name":"Octavia 1.5 eTSI Hybrid","type":"hibrit","cons":5.5},{"name":"Kodiaq 1.5 TSI Benzin","type":"benzin","cons":6.9},{"name":"Enyaq Elektrikli","type":"elektrik","cons":17.0}],"Suzuki":[{"name":"Swift Hybrid","type":"hibrit","cons":4.7},{"name":"Vitara Hybrid","type":"hibrit","cons":5.7},{"name":"S-Cross Hybrid","type":"hibrit","cons":5.8}],"Tesla":[{"name":"Model 3 RWD Elektrikli","type":"elektrik","cons":14.5},{"name":"Model 3 Long Range Elektrikli","type":"elektrik","cons":15.2},{"name":"Model Y RWD Elektrikli","type":"elektrik","cons":16.9},{"name":"Model Y Long Range Elektrikli","type":"elektrik","cons":17.3}],"Togg":[{"name":"T10X V1 RWD Elektrikli","type":"elektrik","cons":18.0},{"name":"T10X V2 RWD Elektrikli","type":"elektrik","cons":18.3}],"Toyota":[{"name":"Yaris 1.5 Hybrid","type":"hibrit","cons":4.0},{"name":"Corolla 1.5 Benzin","type":"benzin","cons":6.5},{"name":"Corolla 1.8 Hybrid","type":"hibrit","cons":4.6},{"name":"C-HR 1.8 Hybrid","type":"hibrit","cons":4.8},{"name":"RAV4 Hybrid","type":"hibrit","cons":5.8}],"Volkswagen":[{"name":"Polo 1.0 TSI Benzin","type":"benzin","cons":5.6},{"name":"Golf 1.0 TSI Benzin","type":"benzin","cons":5.8},{"name":"Golf 1.5 eTSI Hybrid","type":"hibrit","cons":5.5},{"name":"Passat 1.5 TSI Benzin","type":"benzin","cons":6.5},{"name":"T-Roc 1.5 TSI Benzin","type":"benzin","cons":6.6},{"name":"ID.4 Elektrikli","type":"elektrik","cons":17.0}],"Volvo":[{"name":"XC40 B3 Mild Hybrid","type":"hibrit","cons":6.7},{"name":"EX30 Elektrikli","type":"elektrik","cons":15.7},{"name":"XC60 B5 Mild Hybrid","type":"hibrit","cons":7.5}]};
+
+  function fallbackVehicles(){
+    const rows=[];
+    Object.keys(fallbackVehicleMap).forEach(brand=>{
+      (fallbackVehicleMap[brand]||[]).forEach(item=>{
+        const type=normalizeFuelType(item.type);
+        rows.push({id:item.id||slugify(brand+' '+item.name),brand,name:item.name,label:brand+' '+item.name,type,cons:Number(item.cons),unit:item.unit||(type==='elektrik'?'kWh/100 km':'L/100 km'),source:'Yerleşik araç kataloğu',updatedAt:''});
+      });
+    });
+    return rows.sort((a,b)=>a.label.localeCompare(b.label,'tr'));
+  }
+
+  const typeLabels={benzin:'Benzin',dizel:'Dizel',motorin:'Dizel',lpg:'LPG',hibrit:'Hibrit',elektrik:'Elektrikli'};
+
+  function $(id){return document.getElementById(id);}
+  function normalizeText(value){
+    return String(value||'').toLocaleLowerCase('tr-TR')
+      .replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c')
+      .replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  }
+  function normalizeFuelType(value){
+    const v=normalizeText(value);
+    if(v==='motorin'||v==='diesel')return 'dizel';
+    if(v==='ev'||v==='electric')return 'elektrik';
+    if(v==='hybrid')return 'hibrit';
+    return ['benzin','dizel','lpg','hibrit','elektrik'].includes(v)?v:'benzin';
+  }
+  function typeName(value){return typeLabels[normalizeFuelType(value)]||String(value||'');}
+  function slugify(value){return normalizeText(value).replace(/\s+/g,'-');}
+  function fmt(value,digits=2){return new Intl.NumberFormat('tr-TR',{minimumFractionDigits:digits,maximumFractionDigits:digits}).format(Number(value)||0);}
+  function money(value,digits=2){return fmt(value,digits)+' TL';}
+  function parseNumber(value){
+    let s=String(value??'').trim().replace(/\s/g,'');
+    if(!s)return NaN;
+    if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');
+    else if(s.includes(','))s=s.replace(',','.');
+    return Number(s);
+  }
+  function validPositive(value){return Number.isFinite(value)&&value>0;}
+  function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function showStatus(element,message,kind){
+    if(typeof element==='string')element=$(element);
+    if(!element)return;
+    element.textContent=message;
+    element.className='nky-status'+(kind?' '+kind:'');
+  }
+  function getStored(key,fallback=null){try{const x=localStorage.getItem(key);return x===null?fallback:JSON.parse(x);}catch(e){return fallback;}}
+  function setStored(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(e){}}
+  function getCached(key){const x=getStored(key);return x&&Date.now()-x.time<CACHE_TTL?x.value:null;}
+  function setCached(key,value){setStored(key,{time:Date.now(),value});}
+
+  function normalizeVehiclePayload(payload){
+    let rows=[];
+    const source=payload&&payload.data&&typeof payload.data==='object'&&!Array.isArray(payload.data)?payload.data:payload;
+
+    if(Array.isArray(payload))rows=payload;
+    else if(Array.isArray(payload?.vehicles))rows=payload.vehicles;
+    else if(Array.isArray(payload?.araclar))rows=payload.araclar;
+    else if(Array.isArray(payload?.rows))rows=payload.rows;
+    else if(Array.isArray(payload?.data))rows=payload.data;
+    else if(source&&typeof source==='object'){
+      Object.keys(source).forEach(brand=>{
+        const list=source[brand];
+        if(!Array.isArray(list))return;
+        list.forEach(item=>rows.push(Object.assign({brand},item)));
+      });
+    }
+
+    const result=[];
+    rows.forEach(r=>{
+      if(!r||typeof r!=='object')return;
+      if(r.active===false||['hayır','hayir','false','0','pasif'].includes(String(r.active||'').toLocaleLowerCase('tr-TR')))return;
+      const brand=String(r.brand||r.marka||'').trim();
+      const name=String(r.name||r.modelMotor||r.model||r.motor||'').trim();
+      const type=normalizeFuelType(r.type||r.yakitTuru||r.yakitturu||r.yakit);
+      const cons=parseNumber(r.cons??r.tuketim??r.consumption);
+      if(!brand||!name||!validPositive(cons))return;
+      result.push({
+        id:String(r.id||r.slug||slugify(brand+' '+name)),
+        brand,name,label:brand+' '+name,type,cons,
+        unit:r.unit||r.birim||(type==='elektrik'?'kWh/100 km':'L/100 km'),
+        source:r.source||r.kaynak||'',updatedAt:r.updatedAt||r.guncellemeTarihi||''
+      });
+    });
+    return result.sort((a,b)=>a.label.localeCompare(b.label,'tr'));
+  }
+
+  async function loadVehicles(force=false){
+    const cacheKey='nky_vehicle_catalogue_v3';
+    if(!force){const cached=getCached(cacheKey);if(cached?.length)return cached;}
+    const url=VEHICLE_API+'?mode=vehicles&client='+encodeURIComponent(CLIENT)+'&site='+encodeURIComponent(SITE)+(force?'&_='+Date.now():'');
+    try{
+      const response=await fetch(url,{cache:force?'no-store':'default'});
+      if(!response.ok)throw new Error('HTTP '+response.status);
+      const json=await response.json();
+      if(json.ok===false)throw new Error(json.error||'Araç servisi yanıt vermedi');
+      const vehicles=normalizeVehiclePayload(json);
+      if(!vehicles.length)throw new Error('Araç listesi boş');
+      setCached(cacheKey,vehicles);
+      return vehicles;
+    }catch(error){
+      console.error('Araç kataloğu:',error);
+      return fallbackVehicles();
+    }
+  }
+
+  async function fetchJson(url,cacheKey,ttl=CACHE_TTL){
+    if(cacheKey){
+      const raw=getStored(cacheKey);
+      if(raw&&Date.now()-raw.time<ttl)return raw.value;
+    }
+    const response=await fetch(url);
+    if(!response.ok)throw new Error('HTTP '+response.status);
+    const json=await response.json();
+    if(json.ok===false)throw new Error(json.error||'Servis hatası');
+    if(cacheKey)setStored(cacheKey,{time:Date.now(),value:json});
+    return json;
+  }
+  async function loadFuelPrices(city,district='',force=false){
+    const c=String(city||'Ankara').trim()||'Ankara';
+    const d=String(district||'').trim();
+    const key='nky_price_'+normalizeText(c)+'_'+normalizeText(d);
+    const url=PRICE_API+'?city='+encodeURIComponent(c)+'&district='+encodeURIComponent(d)+(force?'&_='+Date.now():'');
+    return fetchJson(url,force?null:key,10*60*1000);
+  }
+  async function loadChargePrices(force=false){
+    const url=PRICE_API+'?mode=charge'+(force?'&_='+Date.now():'');
+    return fetchJson(url,force?null:'nky_charge_prices',30*60*1000);
+  }
+  function priceFromPayload(type,fuel,charge,tariff='ac'){
+    const t=normalizeFuelType(type);
+    if(t==='elektrik')return parseNumber(tariff==='dc'?charge?.dc:charge?.ac);
+    if(t==='dizel')return parseNumber(fuel?.motorin);
+    if(t==='lpg')return parseNumber(fuel?.lpg);
+    return parseNumber(fuel?.benzin);
+  }
+
+  function createVehicleAutocomplete({
+    input,panel,onSelect,status,restore=true,paramName='vehicle',storedKey='nky_last_vehicle',
+    fuelParam='',consumptionParam=''
+  }){
+    let vehicles=fallbackVehicles();
+    let activeIndex=-1;
+    let restored=false;
+    let syntheticApplied=false;
+    let selectedId='';
+    const inputEl=typeof input==='string'?$(input):input;
+    const panelEl=typeof panel==='string'?$(panel):panel;
+    const statusEl=typeof status==='string'?$(status):status;
+    if(!inputEl||!panelEl)throw new Error('Araç arama alanı bulunamadı.');
+
+    function setVehicleStatus(message,kind){
+      if(!statusEl)return;
+      statusEl.textContent=message;
+      statusEl.className='nky-selected'+(kind?' '+kind:'');
+    }
+    function close(){panelEl.classList.remove('show');activeIndex=-1;sendHeight();}
+    function currentList(){return Array.from(panelEl.querySelectorAll('.nky-suggestion'));}
+
+    let nativeWrap=inputEl.parentElement.querySelector('.nky-native-vehicle-wrap');
+    let nativeSelect;
+    if(!nativeWrap){
+      nativeWrap=document.createElement('div');
+      nativeWrap.className='nky-native-vehicle-wrap';
+      nativeWrap.innerHTML='<label class="nky-native-vehicle-label">Veya araç listesinden seçin</label><select class="nky-native-vehicle-select" aria-label="Araç listesinden seç"><option value="">Araç listesini açın</option></select>';
+      panelEl.insertAdjacentElement('afterend',nativeWrap);
+    }
+    nativeSelect=nativeWrap.querySelector('.nky-native-vehicle-select');
+
+    function populateNative(){
+      const previous=selectedId||nativeSelect.value;
+      nativeSelect.innerHTML='<option value="">Araç listesini açın</option>';
+      const groups=new Map();
+      vehicles.forEach(v=>{
+        if(!groups.has(v.brand))groups.set(v.brand,[]);
+        groups.get(v.brand).push(v);
+      });
+      Array.from(groups.keys()).sort((a,b)=>a.localeCompare(b,'tr')).forEach(brand=>{
+        const group=document.createElement('optgroup');
+        group.label=brand;
+        groups.get(brand).forEach(v=>{
+          const option=document.createElement('option');
+          option.value=v.id;
+          option.textContent=v.name+' · '+typeName(v.type)+' · '+fmt(v.cons,1)+' '+v.unit;
+          group.appendChild(option);
+        });
+        nativeSelect.appendChild(group);
+      });
+      if(previous&&vehicles.some(v=>v.id===previous))nativeSelect.value=previous;
+    }
+
+    function applyVehicle(v,persist=true){
+      if(!v)return;
+      selectedId=v.id||'';
+      inputEl.value=v.label;
+      if(selectedId&&Array.from(nativeSelect.options).some(o=>o.value===selectedId))nativeSelect.value=selectedId;
+      close();
+      if(typeof onSelect==='function')onSelect(v);
+      if(persist&&storedKey)setStored(storedKey,v);
+    }
+
+    function filteredVehicles(){
+      const q=normalizeText(inputEl.value);
+      return vehicles.filter(v=>!q||normalizeText(v.label).includes(q)).slice(0,q?50:100);
+    }
+    function render(){
+      const list=filteredVehicles();
+      panelEl.innerHTML='';
+      if(!list.length){
+        panelEl.innerHTML='<div class="nky-status warn">Araç bulunamadı. Marka veya model adını daha kısa yazın ya da aşağıdaki araç listesini açın.</div>';
+        panelEl.classList.add('show');sendHeight();return;
+      }
+      list.forEach(v=>{
+        const button=document.createElement('button');
+        button.type='button';button.className='nky-suggestion';button.dataset.id=v.id;
+        button.innerHTML='<span class="nky-suggestion-main"><strong>'+escapeHtml(v.label)+'</strong><small>'+escapeHtml(typeName(v.type))+' · '+fmt(v.cons,1)+' '+escapeHtml(v.unit)+'</small></span><span class="nky-badge">Seç</span>';
+        button.addEventListener('pointerdown',e=>e.preventDefault());
+        button.addEventListener('mousedown',e=>e.preventDefault());
+        button.addEventListener('click',()=>applyVehicle(v,true));
+        panelEl.appendChild(button);
+      });
+      panelEl.classList.add('show');sendHeight();
+    }
+
+    function findCandidate(){
+      if(!restore||restored)return null;
+      const params=new URLSearchParams(location.search);
+      const raw=String(params.get(paramName)||'').trim();
+      const stored=storedKey?getStored(storedKey):null;
+      const q=normalizeText(raw);
+      let candidate=null;
+      if(q){
+        candidate=vehicles.find(x=>{
+          const id=normalizeText(x.id),label=normalizeText(x.label);
+          return id===q||label===q||label.includes(q)||q.includes(label);
+        });
+      }else if(stored){
+        candidate=vehicles.find(x=>x.id===stored.id||normalizeText(x.label)===normalizeText(stored.label));
+      }
+      if(candidate){
+        restored=true;
+        applyVehicle(candidate,false);
+        return candidate;
+      }
+
+      if(raw&&!syntheticApplied){
+        const suffix=(paramName.match(/\d+$/)||[''])[0];
+        const fuelKey=fuelParam||('fuel'+suffix);
+        const consKey=consumptionParam||('consumption'+suffix);
+        const fuelRaw=params.get(fuelKey)||params.get('fuel')||'benzin';
+        const cons=parseNumber(params.get(consKey)||params.get('consumption'));
+        inputEl.value=raw;
+        if(validPositive(cons)){
+          const type=normalizeFuelType(fuelRaw);
+          const synthetic={
+            id:'aktarilan-'+slugify(raw),brand:'',name:raw,label:raw,type,cons,
+            unit:type==='elektrik'?'kWh/100 km':'L/100 km',source:'Ana sayfadan aktarıldı',updatedAt:''
+          };
+          syntheticApplied=true;
+          applyVehicle(synthetic,false);
+          setVehicleStatus('Ana sayfadan aktarılan araç kullanılıyor: '+raw+'. İsterseniz listeden başka araç seçebilirsiniz.','ok');
+        }else{
+          syntheticApplied=true;
+          setVehicleStatus('Araç adı ana sayfadan aktarıldı. Katalog eşleşmesi bekleniyor; gerekirse aşağıdaki listeden seçin.','');
+        }
+      }
+      return null;
+    }
+
+    inputEl.addEventListener('focus',render);
+    inputEl.addEventListener('click',render);
+    inputEl.addEventListener('input',()=>{selectedId='';nativeSelect.value='';render();});
+    inputEl.addEventListener('keydown',event=>{
+      const list=currentList();
+      if(event.key==='Escape'){close();return;}
+      if(!list.length)return;
+      if(event.key==='ArrowDown'){event.preventDefault();activeIndex=Math.min(activeIndex+1,list.length-1);}
+      else if(event.key==='ArrowUp'){event.preventDefault();activeIndex=Math.max(activeIndex-1,0);}
+      else if(event.key==='Enter'){
+        if(activeIndex>=0){event.preventDefault();list[activeIndex].click();return;}
+        const q=normalizeText(inputEl.value);
+        const exact=vehicles.find(v=>normalizeText(v.label)===q);
+        if(exact){event.preventDefault();applyVehicle(exact,true);return;}
+      }
+      list.forEach((x,i)=>x.classList.toggle('active',i===activeIndex));
+      if(activeIndex>=0)list[activeIndex]?.scrollIntoView({block:'nearest'});
+    });
+    inputEl.addEventListener('blur',()=>setTimeout(close,220));
+    nativeSelect.addEventListener('change',()=>{
+      const candidate=vehicles.find(v=>v.id===nativeSelect.value);
+      if(candidate)applyVehicle(candidate,true);
+    });
+
+    populateNative();
+    setVehicleStatus('Araç listesi hazır: '+vehicles.length+' araç. Arama alanını veya listeyi kullanabilirsiniz.','ok');
+    findCandidate();
+
+    loadVehicles().then(v=>{
+      if(Array.isArray(v)&&v.length)vehicles=v;
+      populateNative();
+      const matched=findCandidate();
+      if(!matched&&!syntheticApplied)setVehicleStatus('Araç kataloğu hazır: '+vehicles.length+' araç.','ok');
+      if(panelEl.classList.contains('show'))render();
+      sendHeight();
+    }).catch(error=>{
+      console.error('Araç kataloğu yüklenemedi:',error);
+      populateNative();
+      setVehicleStatus('Canlı katalog alınamadı; yerleşik '+vehicles.length+' araçlık liste kullanılabilir.','warn');
+      sendHeight();
+    });
+
+    return {setVehicles(v){vehicles=v?.length?v:fallbackVehicles();populateNative();},render,close,getVehicles:()=>vehicles};
+  }
+
+  function fillLocationSelects(citySelect,districtSelect,defaultCity=''){
+    const cityEl=typeof citySelect==='string'?$(citySelect):citySelect;
+    const distEl=typeof districtSelect==='string'?$(districtSelect):districtSelect;
+    const data=global.NKY_LOCATIONS||{cities:[],districts:{}};
+    cityEl.innerHTML='<option value="">İl seçin</option>'+data.cities.map(c=>'<option value="'+escapeHtml(c)+'">'+escapeHtml(c)+'</option>').join('');
+    function updateDistricts(){
+      const rows=data.districts[cityEl.value]||[];
+      distEl.innerHTML='<option value="">İl merkezi / ilçe seçme</option>'+rows.map(d=>'<option value="'+escapeHtml(d)+'">'+escapeHtml(d)+'</option>').join('');
+      distEl.disabled=!cityEl.value||!rows.length;
+    }
+    cityEl.addEventListener('change',updateDistricts);
+    if(defaultCity&&data.cities.includes(defaultCity)){cityEl.value=defaultCity;updateDistricts();}
+    return updateDistricts;
+  }
+
+  async function geocodeLocation(city,district=''){
+    const query=(district?district+', ':'')+city+', Türkiye';
+    const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=tr&accept-language=tr&q='+encodeURIComponent(query);
+    const response=await fetch(url,{headers:{'Accept':'application/json'}});
+    if(!response.ok)throw new Error('Konum servisi yanıt vermedi');
+    const json=await response.json();
+    if(!json?.length)throw new Error(query+' bulunamadı');
+    return [parseNumber(json[0].lon),parseNumber(json[0].lat)];
+  }
+  async function calculateRoute({fromCity,fromDistrict='',toCity,toDistrict=''}){
+    if(!fromCity||!toCity)throw new Error('Kalkış ve varış ili seçin.');
+    if(fromCity===toCity&&(!fromDistrict||!toDistrict||fromDistrict===toDistrict))throw new Error('Aynı il içindeki rota için iki farklı ilçe seçin.');
+    const points=await Promise.all([geocodeLocation(fromCity,fromDistrict),geocodeLocation(toCity,toDistrict)]);
+    const url='https://router.project-osrm.org/route/v1/driving/'+points[0].join(',')+';'+points[1].join(',')+'?overview=false&steps=false';
+    const response=await fetch(url);
+    if(!response.ok)throw new Error('Rota servisi yanıt vermedi');
+    const json=await response.json();
+    if(!json.routes?.length)throw new Error('Karayolu rotası bulunamadı');
+    const route=json.routes[0];
+    return {distanceKm:Math.round(route.distance/1000),durationMin:Math.round(route.duration/60),fromLabel:(fromDistrict?fromDistrict+', ':'')+fromCity,toLabel:(toDistrict?toDistrict+', ':'')+toCity};
+  }
+  function durationText(minutes){const h=Math.floor(minutes/60),m=minutes%60;return (h?h+' sa ':'')+m+' dk';}
+  function mapsUrl(fromLabel,toLabel){return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(fromLabel+', Türkiye')+'&destination='+encodeURIComponent(toLabel+', Türkiye')+'&travelmode=driving';}
+
+  async function shareText(title,text,url=location.href){
+    if(navigator.share){try{await navigator.share({title,text,url});return 'shared';}catch(e){if(e.name==='AbortError')return 'cancelled';}}
+    if(navigator.clipboard){await navigator.clipboard.writeText(text+' '+url);return 'copied';}
+    return 'unsupported';
+  }
+  function openWhatsApp(text,url=location.href){window.open('https://wa.me/?text='+encodeURIComponent(text+' '+url),'_blank','noopener');}
+  function sendHeight(){
+    const height=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);
+    if(global.parent!==global)global.parent.postMessage({type:'nky-iframe-height',height,path:location.pathname},'*');
+  }
+  global.NKY={
+    $,VEHICLE_API,PRICE_API,normalizeText,normalizeFuelType,typeName,fmt,money,parseNumber,validPositive,escapeHtml,
+    showStatus,getStored,setStored,loadVehicles,loadFuelPrices,loadChargePrices,priceFromPayload,createVehicleAutocomplete,
+    fillLocationSelects,calculateRoute,durationText,mapsUrl,shareText,openWhatsApp,sendHeight
+  };
+  try{
+    if('ResizeObserver' in global){
+      const observer=new ResizeObserver(()=>requestAnimationFrame(sendHeight));
+      observer.observe(document.documentElement);
+    }else{
+      global.setInterval(sendHeight,1000);
+    }
+  }catch(error){console.warn('Iframe yükseklik gözlemcisi başlatılamadı:',error);}
+  global.addEventListener('load',sendHeight);
+  global.addEventListener('resize',sendHeight);
+})(window);
+
+</script>
+<script>
+(function(){
+  'use strict';
+  const N=window.NKY;
+  let selectedVehicle=null;
+  let lastText='';
+  const initialParams=new URLSearchParams(location.search);
+  const initialConsumption=N.parseNumber(initialParams.get('consumption'));
+  const initialFuel=N.normalizeFuelType(initialParams.get('fuel'));
+  let useInitialConsumption=N.validPositive(initialConsumption);
+  N.fillLocationSelects('priceCity',document.createElement('select'),'Ankara');
+  const initialCity=String(initialParams.get('city')||'').trim();
+  if(initialCity&&Array.from(N.$('priceCity').options).some(option=>option.value===initialCity))N.$('priceCity').value=initialCity;
+  const initialMonthlyKm=N.parseNumber(initialParams.get('monthlyKm'));
+  if(N.validPositive(initialMonthlyKm))N.$('monthlyKm').value=N.fmt(initialMonthlyKm,0);
+
+  if(initialParams.get('fuel'))N.$('fuelType').value=initialFuel;
+  if(useInitialConsumption)N.$('consumption').value=N.fmt(initialConsumption,1);
+
+  function updateUnits(){
+    const electric=N.$('fuelType').value==='elektrik';
+    N.$('consumptionUnit').textContent=electric?'kWh/100 km':'L/100 km';
+    N.$('priceUnit').textContent=electric?'TL/kWh':'TL/L';
+    N.$('tariffField').classList.toggle('nky-hidden',!electric);
+  }
+  N.$('fuelType').addEventListener('change',()=>{updateUnits();selectedVehicle=null;N.$('vehicleSelected').classList.remove('ok');N.$('vehicleSelected').textContent='Yakıt türü elle değiştirildi. Tüketim ve fiyatı kontrol edin.';});
+  updateUnits();
+
+  N.createVehicleAutocomplete({
+    input:'vehicleSearch',panel:'vehicleSuggestions',status:'vehicleSelected',
+    onSelect(vehicle){
+      selectedVehicle=vehicle;N.$('fuelType').value=vehicle.type;N.$('consumption').value=useInitialConsumption?N.fmt(initialConsumption,1):N.fmt(vehicle.cons,1);useInitialConsumption=false;updateUnits();
+      N.$('vehicleSelected').textContent='Seçili araç: '+vehicle.label+' · '+N.typeName(vehicle.type)+' · '+N.fmt(vehicle.cons,1)+' '+vehicle.unit;
+      N.$('vehicleSelected').className='nky-selected ok';loadPrice(false);
+    }
+  });
+
+  N.$('priceButton').addEventListener('click',()=>loadPrice(true));
+  N.$('electricTariff').addEventListener('change',()=>{
+    if(N.$('electricTariff').value==='home'){
+      N.$('unitPrice').value='';N.showStatus('priceStatus','Evden şarj için faturanızdaki yaklaşık TL/kWh değerini yazın.','warn');
+    }else loadPrice(false);
+  });
+  async function loadPrice(force){
+    const type=N.$('fuelType').value,city=N.$('priceCity').value||'Ankara';
+    if(type==='elektrik'&&N.$('electricTariff').value==='home'){N.showStatus('priceStatus','Evden şarj fiyatını manuel girin.','warn');return;}
+    N.showStatus('priceStatus','Güncel fiyat getiriliyor…');
+    try{
+      let price;
+      if(type==='elektrik'){const charge=await N.loadChargePrices(force);price=N.priceFromPayload(type,null,charge,N.$('electricTariff').value);}
+      else{const fuel=await N.loadFuelPrices(city,'',force);price=N.priceFromPayload(type,fuel,null);}
+      if(!N.validPositive(price))throw new Error('Fiyat bulunamadı');
+      N.$('unitPrice').value=N.fmt(price,2);N.showStatus('priceStatus',city+' için '+N.typeName(type)+' birim fiyatı '+N.fmt(price,2)+' '+(type==='elektrik'?'TL/kWh':'TL/L')+' olarak getirildi.','ok');
+    }catch(error){N.showStatus('priceStatus','Fiyat alınamadı: '+error.message+'. Alanı elle doldurabilirsiniz.','error');}
+  }
+
+  function calculate(scroll=true){
+    const km=N.parseNumber(N.$('monthlyKm').value),cons=N.parseNumber(N.$('consumption').value),price=N.parseNumber(N.$('unitPrice').value);
+    const error=N.$('formError');
+    if(![km,cons,price].every(N.validPositive)){error.textContent='Aylık kilometre, ortalama tüketim ve birim fiyat alanlarını kontrol edin.';error.classList.remove('nky-hidden');return false;}
+    error.classList.add('nky-hidden');
+    const energy=km*cons/100,per100=cons*price,monthly=energy*price,yearly=monthly*12;
+    const type=N.$('fuelType').value,unit=type==='elektrik'?'kWh':'litre',vehicle=selectedVehicle?.label||N.typeName(type)+' araç';
+    N.$('monthlyCost').textContent=N.money(monthly);N.$('yearlyCost').textContent=N.money(yearly);N.$('per100').textContent=N.money(per100);N.$('perKm').textContent=N.fmt(monthly/km,2)+' TL/km';N.$('monthlyEnergy').textContent=N.fmt(energy,2)+' '+unit;N.$('energyLabel').textContent=type==='elektrik'?'Aylık enerji':'Aylık yakıt';
+    N.showStatus('resultNote',N.fmt(km,0)+' km/ay ve '+N.fmt(cons,1)+' '+(type==='elektrik'?'kWh/100 km':'L/100 km')+' üzerinden hesaplandı.','warn');
+    lastText=vehicle+' için aylık '+N.fmt(km,0)+' km kullanımda tahmini gider '+N.money(monthly)+', yıllık '+N.money(yearly)+'.';
+    N.$('result').classList.add('show');if(scroll)N.$('result').scrollIntoView({behavior:'smooth',block:'start'});N.sendHeight();return true;
+  }
+  N.$('calculateButton').addEventListener('click',()=>calculate(true));
+  document.querySelectorAll('[data-km]').forEach(button=>button.addEventListener('click',()=>{N.$('monthlyKm').value=button.dataset.km;if(N.$('result').classList.contains('show'))calculate(false);}));
+
+  N.$('shareButton').addEventListener('click',async()=>{if(lastText){const r=await N.shareText('Aylık araç gideri',lastText,'https://www.arabanekadaryakar.com/p/aylk-yakt-gideri-hesaplama.html');if(r==='copied')N.showStatus('resultNote','Sonuç panoya kopyalandı.','ok');}});
+  N.$('whatsappButton').addEventListener('click',()=>{if(lastText)N.openWhatsApp(lastText,'https://www.arabanekadaryakar.com/p/aylk-yakt-gideri-hesaplama.html');});
+  N.$('copyButton').addEventListener('click',async()=>{if(lastText){await navigator.clipboard.writeText(lastText);N.showStatus('resultNote','Sonuç panoya kopyalandı.','ok');}});
+})();
+
+</script>
 </body>
 </html>
