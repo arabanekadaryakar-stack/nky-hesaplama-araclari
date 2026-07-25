@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b5cab">
+  <title>Aylık Yakıt ve Elektrik Gideri Hesaplama</title>
+  <meta name="description" content="Aracınızın aylık kilometre, ortalama tüketim ve güncel fiyatına göre aylık ve yıllık yakıt veya elektrik giderini hesaplayın.">
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+<header class="nky-topbar"><div class="nky-shell nky-topbar-inner">
+  <a class="nky-brand" href="https://www.arabanekadaryakar.com/" target="_top">⛽ Ne Kadar Yakar?</a>
+  <nav class="nky-nav" aria-label="Hesaplama araçları">
+    <a href="../ayrintili-hesaplama/">Ayrıntılı</a>
+    <a href="../arac-karsilastirma/">Karşılaştır</a>
+    <a class="active" href="../aylik-hesaplama/">Aylık</a>
+  </nav>
+</div></header>
+<main class="nky-shell">
+  <section class="nky-hero">
+    <span class="nky-kicker">Aylık araç bütçesi</span>
+    <h1>Aylık yakıt veya şarj giderinizi hesaplayın</h1>
+    <p>Aracınızı seçin, ayda kaç kilometre yaptığınızı yazın ve aylık, yıllık, 100 km ve kilometre başına maliyeti görün.</p>
+  </section>
+
+  <section class="nky-card">
+    <h2>1. Araç ve kullanım bilgileri</h2>
+    <p class="nky-card-sub">Araç seçmek zorunlu değildir; tüketim ve fiyat değerlerini elle de girebilirsiniz.</p>
+    <div class="nky-field nky-autocomplete">
+      <label for="vehicleSearch">Marka, model veya motor</label>
+      <input id="vehicleSearch" type="search" autocomplete="off" placeholder="Örn. Fiat Egea, Togg T10X, Clio 1.0">
+      <div class="nky-suggestions" id="vehicleSuggestions"></div>
+    </div>
+    <div class="nky-selected" id="vehicleSelected">Araç kataloğu yükleniyor…</div>
+
+    <div class="nky-grid nky-grid-4" style="margin-top:14px">
+      <div class="nky-field"><label for="monthlyKm">Aylık toplam kilometre</label><div class="nky-input-wrap"><input id="monthlyKm" type="text" inputmode="decimal" value="1000"><span class="nky-unit">km</span></div></div>
+      <div class="nky-field"><label for="consumption">Ortalama tüketim</label><div class="nky-input-wrap"><input id="consumption" type="text" inputmode="decimal" placeholder="Örn. 7,2"><span class="nky-unit" id="consumptionUnit">L/100 km</span></div></div>
+      <div class="nky-field"><label for="fuelType">Yakıt / enerji türü</label><select id="fuelType"><option value="benzin">Benzin</option><option value="dizel">Dizel</option><option value="lpg">LPG</option><option value="hibrit">Hibrit</option><option value="elektrik">Elektrikli</option></select></div>
+      <div class="nky-field"><label for="priceCity">Fiyat ili</label><select id="priceCity"></select></div>
+    </div>
+
+    <div class="nky-grid nky-grid-3" style="margin-top:13px">
+      <div class="nky-field nky-hidden" id="tariffField"><label for="electricTariff">Şarj türü</label><select id="electricTariff"><option value="ac">Halka açık AC</option><option value="dc">Halka açık DC</option><option value="home">Evden şarj / manuel</option></select></div>
+      <div class="nky-field"><label for="unitPrice">Birim fiyat</label><div class="nky-input-wrap"><input id="unitPrice" type="text" inputmode="decimal" placeholder="Örn. 65,40"><span class="nky-unit" id="priceUnit">TL/L</span></div></div>
+      <div class="nky-field"><label>&nbsp;</label><button class="nky-button" type="button" id="priceButton">Güncel fiyatı getir</button></div>
+    </div>
+    <div class="nky-status" id="priceStatus">Araç seçildiğinde tüketim hazırlanır; fiyatı otomatik getirebilir veya elle yazabilirsiniz.</div>
+
+    <div class="nky-actions"><button class="nky-button primary" id="calculateButton" type="button">Aylık gideri hesapla</button></div>
+    <div class="nky-status error nky-hidden" id="formError"></div>
+
+    <div class="nky-result" id="result">
+      <div class="nky-result-title">Tahmini aylık yakıt / enerji gideri</div>
+      <div class="nky-result-total" id="monthlyCost">0 TL</div>
+      <div class="nky-metrics">
+        <div class="nky-metric"><small>Yıllık tahmini gider</small><strong id="yearlyCost">0 TL</strong></div>
+        <div class="nky-metric"><small>100 km maliyeti</small><strong id="per100">0 TL</strong></div>
+        <div class="nky-metric"><small>Kilometre maliyeti</small><strong id="perKm">0 TL/km</strong></div>
+        <div class="nky-metric"><small id="energyLabel">Aylık yakıt / enerji</small><strong id="monthlyEnergy">0</strong></div>
+      </div>
+      <div class="nky-status warn" id="resultNote"></div>
+      <div class="nky-actions"><button class="nky-button primary" id="shareButton" type="button">Paylaş</button><button class="nky-button" id="whatsappButton" type="button">WhatsApp</button><button class="nky-button" id="copyButton" type="button">Kopyala</button></div>
+    </div>
+  </section>
+
+  <section class="nky-card">
+    <h2>Farklı aylık kilometreleri hızlıca deneyin</h2>
+    <p class="nky-card-sub">Son hesaplamadaki tüketim ve fiyat korunarak kilometre değeri değiştirilir.</p>
+    <div class="nky-actions" id="presetButtons">
+      <button class="nky-button" type="button" data-km="500">500 km</button><button class="nky-button" type="button" data-km="1000">1.000 km</button><button class="nky-button" type="button" data-km="1500">1.500 km</button><button class="nky-button" type="button" data-km="2000">2.000 km</button><button class="nky-button" type="button" data-km="3000">3.000 km</button>
+    </div>
+  </section>
+
+  <section class="nky-info">
+    <h2>Aylık gider hesabı nasıl yorumlanmalı?</h2>
+    <p>Aylık enerji miktarı, aylık kilometrenin aracın 100 kilometredeki tüketimiyle çarpılıp 100’e bölünmesiyle bulunur. Aylık gider bu miktarın güncel birim fiyatla çarpımıdır; yıllık değer aylık sonucun 12 katıdır.</p>
+    <h3>Gerçekçi bütçe için</h3>
+    <ul><li>Son birkaç aylık kilometre ortalamanızı kullanın.</li><li>Yoğun şehir içi kullanıyorsanız katalog tüketimini doğrudan kabul etmeyin.</li><li>Elektrikli araçlarda ev, AC ve DC şarj maliyetlerini ayrı senaryolar olarak hesaplayın.</li></ul>
+  </section>
+  <p class="nky-footer-note">Vergi, bakım, sigorta, otopark ve araç finansmanı bu hesapta yer almaz.</p>
+</main>
+<script src="../shared/turkiye-lokasyonlari.js"></script>
+<script src="../shared/core.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

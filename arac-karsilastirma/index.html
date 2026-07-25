@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b5cab">
+  <title>İki Aracı Yakıt ve Enerji Maliyetine Göre Karşılaştır</title>
+  <meta name="description" content="İki aracın 100 km, rota, aylık ve yıllık yakıt veya elektrik maliyetlerini aynı koşullarda karşılaştırın.">
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+<header class="nky-topbar"><div class="nky-shell nky-topbar-inner">
+  <a class="nky-brand" href="https://www.arabanekadaryakar.com/" target="_top">⛽ Ne Kadar Yakar?</a>
+  <nav class="nky-nav" aria-label="Hesaplama araçları">
+    <a href="../ayrintili-hesaplama/">Ayrıntılı</a>
+    <a class="active" href="../arac-karsilastirma/">Karşılaştır</a>
+    <a href="../aylik-hesaplama/">Aylık</a>
+  </nav>
+</div></header>
+<main class="nky-shell">
+  <section class="nky-hero">
+    <span class="nky-kicker">Araç karşılaştırma</span>
+    <h1>İki aracın kullanım maliyetini karşılaştırın</h1>
+    <p>Aynı rota, mesafe veya aylık kilometrede hangi aracın daha düşük yakıt ya da enerji giderine sahip olduğunu görün.</p>
+  </section>
+
+  <section class="nky-card">
+    <h2>1. Araçları seçin</h2>
+    <p class="nky-card-sub">Araç seçildiğinde tüketim ve yakıt türü otomatik gelir. Birim fiyatları bulunduğunuz ile göre getirebilir veya elle değiştirebilirsiniz.</p>
+    <div class="nky-two-vehicles">
+      <article class="nky-vehicle-card">
+        <span class="nky-kicker">Araç 1</span>
+        <div class="nky-field nky-autocomplete" style="margin-top:10px">
+          <label for="vehicle1">Marka, model veya motor</label>
+          <input id="vehicle1" type="search" autocomplete="off" placeholder="Örn. Chery Omoda 5">
+          <div class="nky-suggestions" id="suggestions1"></div>
+        </div>
+        <div class="nky-grid nky-grid-2" style="margin-top:10px">
+          <div class="nky-field"><label for="cons1">Tüketim</label><div class="nky-input-wrap"><input id="cons1" type="text" inputmode="decimal"><span class="nky-unit" id="unit1">L/100 km</span></div></div>
+          <div class="nky-field"><label for="price1">Birim fiyat</label><div class="nky-input-wrap"><input id="price1" type="text" inputmode="decimal"><span class="nky-unit" id="priceUnit1">TL/L</span></div></div>
+        </div>
+        <div class="nky-selected" id="selected1">Araç kataloğu yükleniyor…</div>
+      </article>
+      <div class="nky-vs">VS</div>
+      <article class="nky-vehicle-card">
+        <span class="nky-kicker">Araç 2</span>
+        <div class="nky-field nky-autocomplete" style="margin-top:10px">
+          <label for="vehicle2">Marka, model veya motor</label>
+          <input id="vehicle2" type="search" autocomplete="off" placeholder="Örn. Toyota Corolla Hybrid">
+          <div class="nky-suggestions" id="suggestions2"></div>
+        </div>
+        <div class="nky-grid nky-grid-2" style="margin-top:10px">
+          <div class="nky-field"><label for="cons2">Tüketim</label><div class="nky-input-wrap"><input id="cons2" type="text" inputmode="decimal"><span class="nky-unit" id="unit2">L/100 km</span></div></div>
+          <div class="nky-field"><label for="price2">Birim fiyat</label><div class="nky-input-wrap"><input id="price2" type="text" inputmode="decimal"><span class="nky-unit" id="priceUnit2">TL/L</span></div></div>
+        </div>
+        <div class="nky-selected" id="selected2">Araç kataloğu yükleniyor…</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="nky-card">
+    <h2>2. Karşılaştırma koşulunu seçin</h2>
+    <div class="nky-tabs" role="tablist">
+      <button class="nky-tab active" data-mode="route" type="button">Rota bazında</button>
+      <button class="nky-tab" data-mode="distance" type="button">Mesafe bazında</button>
+      <button class="nky-tab" data-mode="monthly" type="button">Aylık kullanım</button>
+    </div>
+    <div class="nky-panel active" data-panel="route">
+      <div class="nky-grid nky-grid-4">
+        <div class="nky-field"><label for="fromCity">Nereden? İl</label><select id="fromCity"></select></div>
+        <div class="nky-field"><label for="fromDistrict">İlçe <small>(isteğe bağlı)</small></label><select id="fromDistrict" disabled></select></div>
+        <div class="nky-field"><label for="toCity">Nereye? İl</label><select id="toCity"></select></div>
+        <div class="nky-field"><label for="toDistrict">İlçe <small>(isteğe bağlı)</small></label><select id="toDistrict" disabled></select></div>
+      </div>
+      <div class="nky-actions"><button class="nky-button primary" id="routeButton" type="button">Rotayı hesapla</button></div>
+      <div class="nky-status" id="routeStatus">İl ve isteğe bağlı ilçe seçerek yaklaşık karayolu mesafesini getirin.</div>
+    </div>
+    <div class="nky-panel" data-panel="distance">
+      <div class="nky-grid nky-grid-2"><div class="nky-field"><label for="distanceKm">Karşılaştırılacak mesafe</label><div class="nky-input-wrap"><input id="distanceKm" type="text" inputmode="decimal" value="100"><span class="nky-unit">km</span></div></div></div>
+    </div>
+    <div class="nky-panel" data-panel="monthly">
+      <div class="nky-grid nky-grid-2"><div class="nky-field"><label for="monthlyKm">Aylık kullanım</label><div class="nky-input-wrap"><input id="monthlyKm" type="text" inputmode="decimal" value="1500"><span class="nky-unit">km/ay</span></div></div></div>
+    </div>
+  </section>
+
+  <section class="nky-card">
+    <h2>3. Fiyatları getir ve karşılaştır</h2>
+    <div class="nky-grid nky-grid-3">
+      <div class="nky-field"><label for="priceCity">Yakıt fiyatı için il</label><select id="priceCity"></select></div>
+      <div class="nky-field"><label for="electricTariff">Elektrikli araç tarifesi</label><select id="electricTariff"><option value="ac">Halka açık AC</option><option value="dc">Halka açık DC</option></select></div>
+      <div class="nky-field"><label>&nbsp;</label><button class="nky-button" id="priceButton" type="button">Güncel fiyatları getir</button></div>
+    </div>
+    <div class="nky-status" id="priceStatus">Araçlar seçildiğinde güncel fiyatları otomatik getirebilirsiniz.</div>
+    <div class="nky-actions"><button class="nky-button primary" id="compareButton" type="button">Araçları karşılaştır</button></div>
+    <div class="nky-status error nky-hidden" id="formError"></div>
+
+    <div class="nky-result" id="result">
+      <div class="nky-winner" id="winner"></div>
+      <div class="nky-grid nky-grid-2">
+        <article class="nky-result-card" id="resultCard1">
+          <small id="resultName1">Araç 1</small><strong id="mainCost1">0 TL</strong><span id="mainLabel1">Seçilen koşuldaki maliyet</span>
+          <dl><div><dt>100 km</dt><dd id="per100_1">0 TL</dd></div><div><dt>Aylık</dt><dd id="monthly_1">—</dd></div><div><dt>Yıllık</dt><dd id="yearly_1">—</dd></div></dl>
+        </article>
+        <article class="nky-result-card" id="resultCard2">
+          <small id="resultName2">Araç 2</small><strong id="mainCost2">0 TL</strong><span id="mainLabel2">Seçilen koşuldaki maliyet</span>
+          <dl><div><dt>100 km</dt><dd id="per100_2">0 TL</dd></div><div><dt>Aylık</dt><dd id="monthly_2">—</dd></div><div><dt>Yıllık</dt><dd id="yearly_2">—</dd></div></dl>
+        </article>
+      </div>
+      <div class="nky-status warn" id="difference"></div>
+      <div class="nky-actions"><button class="nky-button primary" id="shareButton" type="button">Paylaş</button><button class="nky-button" id="whatsappButton" type="button">WhatsApp</button><button class="nky-button" id="copyButton" type="button">Kopyala</button></div>
+    </div>
+  </section>
+
+  <section class="nky-info">
+    <h2>Karşılaştırma neyi kapsar?</h2>
+    <p>Bu araç yalnızca yakıt veya elektrik giderini karşılaştırır. Satın alma bedeli, bakım, vergi, sigorta, batarya, LPG dönüşümü ve değer kaybı sonuca dahil değildir.</p>
+    <h3>Doğru kıyaslama için</h3>
+    <ul><li>İki araç için aynı mesafe ve fiyat ili kullanılmalıdır.</li><li>Kendi gerçek tüketim değerlerinizi biliyorsanız katalog değerlerini değiştirin.</li><li>Elektrikli araçta kullanacağınız AC veya DC tarifesini seçin.</li></ul>
+  </section>
+  <p class="nky-footer-note">Sonuçlar yaklaşık kullanım maliyetidir ve satın alma tavsiyesi değildir.</p>
+</main>
+<script src="../shared/turkiye-lokasyonlari.js"></script>
+<script src="../shared/core.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

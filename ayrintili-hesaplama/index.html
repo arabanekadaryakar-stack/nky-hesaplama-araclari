@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b5cab">
+  <title>Ayrıntılı Yakıt ve Yolculuk Maliyeti Hesaplama</title>
+  <meta name="description" content="Araç, rota, gidiş-dönüş, otoyol, köprü, otopark ve kişi başı giderlerle ayrıntılı yakıt veya elektrik maliyetini hesaplayın.">
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+<header class="nky-topbar"><div class="nky-shell nky-topbar-inner">
+  <a class="nky-brand" href="https://www.arabanekadaryakar.com/" target="_top">⛽ Ne Kadar Yakar?</a>
+  <nav class="nky-nav" aria-label="Hesaplama araçları">
+    <a class="active" href="../ayrintili-hesaplama/">Ayrıntılı</a>
+    <a href="../arac-karsilastirma/">Karşılaştır</a>
+    <a href="../aylik-hesaplama/">Aylık</a>
+  </nav>
+</div></header>
+<main class="nky-shell">
+  <section class="nky-hero">
+    <span class="nky-kicker">Yolculuk bütçesi</span>
+    <h1>Ayrıntılı yolculuk maliyetini hesaplayın</h1>
+    <p>Aracınızı ve rotanızı seçin; gidiş-dönüş, otoyol, köprü, feribot, otopark ve kişi başı giderleri aynı hesapta görün.</p>
+  </section>
+
+  <section class="nky-card" aria-labelledby="vehicleTitle">
+    <h2 id="vehicleTitle">1. Aracınızı seçin</h2>
+    <p class="nky-card-sub">Araç seçildiğinde yakıt türü ve katalog tüketimi otomatik doldurulur. Kendi ortalamanızı her zaman değiştirebilirsiniz.</p>
+    <div class="nky-grid nky-grid-2">
+      <div class="nky-field full nky-autocomplete">
+        <label for="vehicleSearch">Marka, model veya motor</label>
+        <input id="vehicleSearch" type="search" autocomplete="off" spellcheck="false" placeholder="Örn. Chery Omoda 5, Egea Multijet, Togg T10X">
+        <div class="nky-suggestions" id="vehicleSuggestions"></div>
+      </div>
+      <div class="nky-field">
+        <label for="fuelType">Yakıt / enerji türü</label>
+        <select id="fuelType">
+          <option value="benzin">Benzin</option><option value="dizel">Dizel</option><option value="lpg">LPG</option><option value="hibrit">Hibrit</option><option value="elektrik">Elektrikli</option>
+        </select>
+      </div>
+      <div class="nky-field">
+        <label for="consumption">Ortalama tüketim</label>
+        <div class="nky-input-wrap"><input id="consumption" type="text" inputmode="decimal" placeholder="Örn. 7,2"><span class="nky-unit" id="consumptionUnit">L/100 km</span></div>
+      </div>
+    </div>
+    <div class="nky-selected" id="vehicleSelected">Araç kataloğu yükleniyor…</div>
+  </section>
+
+  <section class="nky-card" aria-labelledby="routeTitle">
+    <h2 id="routeTitle">2. Rotanızı seçin</h2>
+    <p class="nky-card-sub">İlçe seçmek zorunlu değildir. Aynı il içinde hesaplama yapacaksanız iki farklı ilçe seçin.</p>
+    <div class="nky-grid nky-grid-4">
+      <div class="nky-field"><label for="fromCity">Nereden? İl</label><select id="fromCity"></select></div>
+      <div class="nky-field"><label for="fromDistrict">Nereden? İlçe <small>(isteğe bağlı)</small></label><select id="fromDistrict" disabled></select></div>
+      <div class="nky-field"><label for="toCity">Nereye? İl</label><select id="toCity"></select></div>
+      <div class="nky-field"><label for="toDistrict">Nereye? İlçe <small>(isteğe bağlı)</small></label><select id="toDistrict" disabled></select></div>
+    </div>
+    <div class="nky-actions">
+      <button class="nky-button primary" type="button" id="routeButton">Rotayı ve mesafeyi hesapla</button>
+      <a class="nky-button nky-hidden" id="mapsLink" href="#" target="_blank" rel="noopener">Google Maps’te aç</a>
+    </div>
+    <div class="nky-status" id="routeStatus">Kalkış ve varış seçildiğinde yaklaşık karayolu mesafesi hesaplanır.</div>
+    <div class="nky-grid nky-grid-2" style="margin-top:13px">
+      <div class="nky-field"><label for="distance">Tek yön mesafesi</label><div class="nky-input-wrap"><input id="distance" type="text" inputmode="decimal" placeholder="Örn. 450"><span class="nky-unit">km</span></div></div>
+      <div class="nky-inline-check"><input id="roundTrip" type="checkbox"><label for="roundTrip">Gidiş-dönüş hesapla<br><small>Toplam mesafe iki katına çıkarılır.</small></label></div>
+    </div>
+  </section>
+
+  <section class="nky-card" aria-labelledby="priceTitle">
+    <h2 id="priceTitle">3. Güncel fiyat ve ek giderler</h2>
+    <p class="nky-card-sub">Yakıt fiyatı kalkış iline göre getirilmeye çalışılır. İstasyon veya tarife farkı varsa alanı elle düzeltebilirsiniz.</p>
+    <div class="nky-grid nky-grid-3">
+      <div class="nky-field"><label for="priceCity">Fiyat ili</label><select id="priceCity"></select></div>
+      <div class="nky-field nky-hidden" id="tariffField"><label for="electricTariff">Şarj türü</label><select id="electricTariff"><option value="ac">Halka açık AC</option><option value="dc">Halka açık DC</option><option value="home">Evden şarj / manuel</option></select></div>
+      <div class="nky-field"><label for="unitPrice">Birim fiyat</label><div class="nky-input-wrap"><input id="unitPrice" type="text" inputmode="decimal" placeholder="Örn. 65,40"><span class="nky-unit" id="priceUnit">TL/L</span></div></div>
+    </div>
+    <div class="nky-actions"><button class="nky-button" type="button" id="priceButton">Güncel fiyatı getir</button></div>
+    <div class="nky-status" id="priceStatus">Fiyatı otomatik getirebilir veya doğrudan yazabilirsiniz.</div>
+
+    <details class="nky-collapsible">
+      <summary>Otoyol, köprü ve diğer masrafları ekle</summary>
+      <div class="nky-collapsible-body nky-grid nky-grid-4">
+        <div class="nky-field"><label for="tollCost">Otoyol / köprü</label><div class="nky-input-wrap"><input id="tollCost" type="text" inputmode="decimal" value="0"><span class="nky-unit">TL</span></div></div>
+        <div class="nky-field"><label for="parkingCost">Otopark / feribot</label><div class="nky-input-wrap"><input id="parkingCost" type="text" inputmode="decimal" value="0"><span class="nky-unit">TL</span></div></div>
+        <div class="nky-field"><label for="otherCost">Diğer gider</label><div class="nky-input-wrap"><input id="otherCost" type="text" inputmode="decimal" value="0"><span class="nky-unit">TL</span></div></div>
+        <div class="nky-field"><label for="passengers">Masrafı paylaşacak kişi</label><input id="passengers" type="number" inputmode="numeric" min="1" step="1" value="1"></div>
+      </div>
+    </details>
+
+    <div class="nky-actions"><button class="nky-button primary" type="button" id="calculateButton">Toplam maliyeti hesapla</button></div>
+    <div class="nky-status error nky-hidden" id="formError"></div>
+
+    <div class="nky-result" id="result">
+      <div class="nky-result-title">Yakıt / enerji ve ek giderler dahil tahmini toplam</div>
+      <div class="nky-result-total" id="totalCost">0 TL</div>
+      <div class="nky-metrics">
+        <div class="nky-metric"><small>Toplam mesafe</small><strong id="effectiveDistance">0 km</strong></div>
+        <div class="nky-metric"><small id="energyLabel">Yakıt / enerji</small><strong id="energyAmount">0</strong></div>
+        <div class="nky-metric"><small>Yalnız enerji maliyeti</small><strong id="energyCost">0 TL</strong></div>
+        <div class="nky-metric"><small>Ek giderler</small><strong id="extraCost">0 TL</strong></div>
+        <div class="nky-metric"><small>100 km maliyeti</small><strong id="per100">0 TL</strong></div>
+        <div class="nky-metric"><small>Kilometre maliyeti</small><strong id="perKm">0 TL/km</strong></div>
+        <div class="nky-metric"><small>Kişi başı</small><strong id="perPerson">0 TL</strong></div>
+        <div class="nky-metric"><small>Hesaplanan araç</small><strong id="resultVehicle">Manuel giriş</strong></div>
+      </div>
+      <div class="nky-status warn" id="resultNote">Sonuç yaklaşık bütçe tahminidir.</div>
+      <div class="nky-actions">
+        <button class="nky-button primary" type="button" id="shareButton">Sonucu paylaş</button>
+        <button class="nky-button" type="button" id="whatsappButton">WhatsApp</button>
+        <button class="nky-button" type="button" id="copyButton">Kopyala</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="nky-info">
+    <h2>Hesaplama nasıl yapılır?</h2>
+    <p>Yakıt veya enerji maliyeti; toplam mesafe, aracın 100 kilometredeki ortalama tüketimi ve birim fiyat kullanılarak hesaplanır. Otoyol, köprü, feribot, otopark ve diğer giderler sonuca ayrıca eklenir.</p>
+    <h3>Daha doğru sonuç için</h3>
+    <ul><li>Katalog tüketimi yerine benzer yol koşullarındaki kişisel ortalamanızı kullanın.</li><li>Şarjlı araçlarda ev, AC ve DC tarifelerini birbirinden ayırın.</li><li>Ücretli yol tutarını kullanacağınız giriş–çıkış noktalarına göre resmî kaynaktan doğrulayın.</li></ul>
+  </section>
+  <p class="nky-footer-note">Bu araç bütçe planlaması içindir; gerçek tüketim, rota ve fiyat koşullara göre değişebilir.</p>
+</main>
+<script src="../shared/turkiye-lokasyonlari.js"></script>
+<script src="../shared/core.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
