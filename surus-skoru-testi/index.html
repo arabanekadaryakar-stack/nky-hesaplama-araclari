@@ -329,7 +329,7 @@
 
     <div class="cta">
       <p><strong>Bu alışkanlıkların bütçenize etkisini görün.</strong><br>Aracınız ve mesafenizle güncel yol maliyetini hesaplayın.</p>
-      <a href="https://www.arabanekadaryakar.com/p/ayrntl-yakt-maliyeti-hesaplama.html" target="_blank" rel="noopener">Yakıt / Enerji Maliyeti Hesapla</a>
+      <a href="https://www.arabanekadaryakar.com/" target="_blank" rel="noopener">Yakıt / Enerji Maliyeti Hesapla</a>
     </div>
 
     <div class="retry"><button type="button" id="restartBtn">🔄 Testi baştan çöz</button></div>
@@ -719,7 +719,7 @@
 <script>
 (function(){
   'use strict';
-  var targetOrigin = 'https://www.arabanekadaryakar.com';
+  var targetOrigin = '*';
   var lastHeight = 0;
   var timer = null;
 
@@ -758,6 +758,21 @@
   }else{
     setInterval(reportHeight, 800);
   }
+
+  if('MutationObserver' in window && document.body){
+    var mutationObserver = new MutationObserver(reportHeight);
+    mutationObserver.observe(document.body,{
+      childList:true,
+      subtree:true,
+      attributes:true,
+      attributeFilter:['style','class','hidden']
+    });
+  }
+
+  document.addEventListener('click',function(){
+    setTimeout(reportHeight,80);
+    setTimeout(reportHeight,350);
+  },true);
 
   setTimeout(reportHeight, 150);
   setTimeout(reportHeight, 700);

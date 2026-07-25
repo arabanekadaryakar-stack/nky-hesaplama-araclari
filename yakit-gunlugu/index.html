@@ -206,7 +206,7 @@
 
   <aside class="cta">
     <p><strong>Güncel fiyatlarla toplam yol maliyetinizi hesaplayın</strong></p>
-    <a href="https://www.arabanekadaryakar.com/p/ayrntl-yakt-maliyeti-hesaplama.html" target="_blank" rel="noopener">Yakıt Maliyeti Hesaplama Aracını Kullan</a>
+    <a href="https://www.arabanekadaryakar.com/" target="_blank" rel="noopener">Yakıt Maliyeti Hesaplama Aracını Kullan</a>
   </aside>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -768,7 +768,7 @@
 <script>
 (function(){
   'use strict';
-  var targetOrigin = 'https://www.arabanekadaryakar.com';
+  var targetOrigin = '*';
   var lastHeight = 0;
   var timer = null;
 
@@ -807,6 +807,21 @@
   }else{
     setInterval(reportHeight, 800);
   }
+
+  if('MutationObserver' in window && document.body){
+    var mutationObserver = new MutationObserver(reportHeight);
+    mutationObserver.observe(document.body,{
+      childList:true,
+      subtree:true,
+      attributes:true,
+      attributeFilter:['style','class','hidden']
+    });
+  }
+
+  document.addEventListener('click',function(){
+    setTimeout(reportHeight,80);
+    setTimeout(reportHeight,350);
+  },true);
 
   setTimeout(reportHeight, 150);
   setTimeout(reportHeight, 700);
