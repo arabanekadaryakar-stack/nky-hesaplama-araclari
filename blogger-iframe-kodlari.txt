@@ -1,0 +1,71 @@
+BLOGGER SAYFALARINA EKLENECEK IFRAME KODLARI
+
+Aşağıdaki USERNAME ve REPO değerlerini kendi GitHub kullanıcı adınız ve repo adınızla değiştirin.
+Önerilen repo adı: nky-hesaplama-araclari
+
+1) AYRINTILI HESAPLAMA SAYFASI
+
+<div class="nky-external-tool">
+  <iframe
+    id="nkyToolFrame"
+    title="Ayrıntılı yakıt ve yolculuk maliyeti hesaplama"
+    src="https://USERNAME.github.io/REPO/ayrintili-hesaplama/"
+    loading="eager"
+    allow="clipboard-write; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    style="display:block;width:100%;min-height:1500px;border:0;border-radius:16px;background:#f4f7fb;"
+  ></iframe>
+</div>
+
+2) İKİ ARACI KARŞILAŞTIR SAYFASI
+
+<div class="nky-external-tool">
+  <iframe
+    id="nkyToolFrame"
+    title="İki aracın yakıt ve enerji maliyetini karşılaştırma"
+    src="https://USERNAME.github.io/REPO/arac-karsilastirma/"
+    loading="eager"
+    allow="clipboard-write; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    style="display:block;width:100%;min-height:1450px;border:0;border-radius:16px;background:#f4f7fb;"
+  ></iframe>
+</div>
+
+3) AYLIK GİDER SAYFASI
+
+<div class="nky-external-tool">
+  <iframe
+    id="nkyToolFrame"
+    title="Aylık yakıt ve elektrik gideri hesaplama"
+    src="https://USERNAME.github.io/REPO/aylik-hesaplama/"
+    loading="eager"
+    allow="clipboard-write; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    style="display:block;width:100%;min-height:1150px;border:0;border-radius:16px;background:#f4f7fb;"
+  ></iframe>
+</div>
+
+HER BLOGGER SAYFASINDA IFRAME KODUNUN ALTINA EKLEYİN
+
+<script>
+(function(){
+  var frame=document.getElementById('nkyToolFrame');
+  if(!frame)return;
+  window.addEventListener('message',function(event){
+    if(!event.data||event.data.type!=='nky-iframe-height')return;
+    if(event.source!==frame.contentWindow)return;
+    var height=parseInt(event.data.height,10);
+    if(Number.isFinite(height)&&height>400&&height<12000){
+      frame.style.height=(height+20)+'px';
+      frame.style.minHeight='0';
+    }
+  });
+})();
+</script>
+
+NOTLAR
+- Blogger sayfasını düzenlerken HTML görünümüne geçin.
+- Her Blogger sayfasında yalnız bir nkyToolFrame kimliği kullanın.
+- İlk testte iframe yüksekliği büyük görünür; GitHub sayfası yüklenince otomatik küçülür veya büyür.
+- iframe GitHub alan adında çalıştığı için Blogger ana sayfasının localStorage verisini doğrudan okuyamaz.
+- Araç ve fiyat servisleri iframe içinden bağımsız çağrılır.
