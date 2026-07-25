@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17365d">
+<meta name="description" content="8 kısa soruyla sürüş alışkanlıklarınızı değerlendirin; güçlü yönlerinizi ve yakıt veya enerji tasarrufu için geliştirebileceğiniz noktaları görün.">
+<title>Sürüş Skoru Testi | arabanekadaryakar.com</title>
+<style>
+  :root{
+    --navy:#17365d;
+    --navy-2:#0f2948;
+    --blue:#2563eb;
+    --blue-dark:#1d4ed8;
+    --blue-soft:#eff6ff;
+    --green:#15803d;
+    --green-soft:#f0fdf4;
+    --amber:#b45309;
+    --amber-soft:#fffbeb;
+    --red:#c2413b;
+    --red-soft:#fff1f2;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --border:#dbe3ee;
+    --text:#172033;
+    --muted:#667085;
+    --shadow:0 10px 28px rgba(23,54,93,.09);
+    --radius:16px;
+  }
+
+  *{box-sizing:border-box}
+  html{color-scheme:light;scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+    padding:14px 12px calc(42px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+  }
+  button,a{font:inherit}
+  button{-webkit-tap-highlight-color:transparent}
+  .wrap{width:100%;max-width:720px;margin:0 auto}
+
+  .hero{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,var(--navy-2),var(--blue));
+    color:#fff;
+    border-radius:20px;
+    padding:26px 22px;
+    box-shadow:var(--shadow);
+    margin-bottom:16px;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-45px;
+    bottom:-65px;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+  }
+  .hero-inner{position:relative;z-index:1}
+  .hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:10px;
+    padding:6px 10px;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:999px;
+    background:rgba(255,255,255,.1);
+    font-size:.78rem;
+    font-weight:700;
+  }
+  .hero h1{margin:0 0 8px;font-size:clamp(1.45rem,5vw,2rem);line-height:1.2}
+  .hero p{max-width:590px;margin:0;color:rgba(255,255,255,.9);font-size:.94rem;line-height:1.55}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:14px;font-size:.8rem;color:rgba(255,255,255,.9)}
+
+  .progress-panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:13px 14px;
+    margin-bottom:14px;
+    box-shadow:0 4px 14px rgba(23,54,93,.05);
+  }
+  .progress-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .progress-head strong{font-size:.84rem;color:var(--navy)}
+  .progress-head span{font-size:.78rem;color:var(--muted);white-space:nowrap}
+  .progress-track{height:9px;background:#e9eef5;border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),#3b82f6);border-radius:999px;transition:width .28s ease}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+  }
+  .question-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .question-count{color:var(--blue-dark);font-size:.8rem;font-weight:800}
+  .question-category{background:var(--blue-soft);color:var(--blue-dark);border-radius:999px;padding:5px 9px;font-size:.72rem;font-weight:700;text-align:right}
+  .question-text{margin:0 0 6px;color:var(--navy);font-size:clamp(1.08rem,4vw,1.3rem);line-height:1.4}
+  .question-help{margin:0 0 18px;color:var(--muted);font-size:.8rem;line-height:1.45}
+
+  .options{display:grid;gap:10px}
+  .option{
+    position:relative;
+    display:grid;
+    grid-template-columns:28px minmax(0,1fr);
+    align-items:center;
+    gap:11px;
+    width:100%;
+    min-height:58px;
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    background:#fff;
+    color:var(--text);
+    padding:12px 14px;
+    text-align:left;
+    cursor:pointer;
+    transition:border-color .15s ease,background .15s ease,transform .1s ease,box-shadow .15s ease;
+  }
+  .option:hover{border-color:#93b4f5;background:#f8fbff}
+  .option:active{transform:scale(.995)}
+  .option:focus-visible{outline:3px solid rgba(37,99,235,.2);outline-offset:2px;border-color:var(--blue)}
+  .option.selected{border-color:var(--blue);background:var(--blue-soft);box-shadow:0 0 0 1px var(--blue)}
+  .option-mark{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;
+    height:26px;
+    border:2px solid #b9c5d4;
+    border-radius:50%;
+    background:#fff;
+    color:#fff;
+    font-size:.78rem;
+    font-weight:900;
+  }
+  .option.selected .option-mark{border-color:var(--blue);background:var(--blue)}
+  .option-text{font-size:.94rem;line-height:1.42}
+  .option.selected .option-text{font-weight:700;color:var(--navy)}
+
+  .nav-row{display:grid;grid-template-columns:auto minmax(150px,1fr);gap:10px;align-items:center;margin-top:18px}
+  .btn{
+    min-height:48px;
+    border-radius:10px;
+    border:0;
+    padding:11px 18px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .btn:focus-visible{outline:3px solid rgba(37,99,235,.2);outline-offset:2px}
+  .btn:disabled{opacity:.42;cursor:not-allowed}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 5px 12px rgba(37,99,235,.2)}
+  .btn-primary:hover:not(:disabled){background:var(--blue-dark)}
+  .btn-ghost{background:#f8fafc;color:#475467;border:1px solid var(--border)}
+  .btn-secondary{background:#fff;color:var(--navy);border:1px solid var(--border)}
+  .answer-note{min-height:20px;margin:10px 0 0;text-align:right;color:var(--muted);font-size:.74rem}
+
+  .result{display:none;text-align:center}
+  .result-kicker{color:var(--blue-dark);font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+  .result h2{margin:7px 0 4px;color:var(--navy);font-size:1.35rem}
+  .score-ring-wrap{position:relative;width:180px;height:180px;margin:14px auto 8px}
+  .score-ring-wrap svg{display:block;width:180px;height:180px}
+  .score-value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .score-num{font-size:2.45rem;font-weight:900;line-height:1;color:var(--navy)}
+  .score-denom{margin-top:4px;color:var(--muted);font-size:.78rem;font-weight:700}
+  .score-label{font-size:1.22rem;font-weight:900;margin:10px 0 5px}
+  .score-sub{max-width:560px;margin:0 auto;color:var(--muted);font-size:.92rem;line-height:1.55}
+
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0;text-align:left}
+  .insight-card{border:1px solid var(--border);border-radius:13px;padding:15px}
+  .insight-card.good{background:var(--green-soft);border-color:#bbf7d0}
+  .insight-card.focus{background:var(--amber-soft);border-color:#fde68a}
+  .insight-card h3{margin:0 0 10px;color:var(--navy);font-size:.94rem}
+  .insight-card ul{margin:0;padding-left:18px}
+  .insight-card li{margin:6px 0;color:#475467;font-size:.84rem;line-height:1.4}
+
+  .section-title{margin:24px 0 12px;text-align:left;color:var(--navy);font-size:1rem}
+  .breakdown{display:grid;gap:10px;text-align:left}
+  .b-row{border:1px solid var(--border);border-radius:11px;padding:11px 12px;background:#fff}
+  .b-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;font-size:.83rem}
+  .b-title strong{color:var(--text)}
+  .status-pill{flex:0 0 auto;border-radius:999px;padding:4px 8px;font-size:.68rem;font-weight:800}
+  .status-good{background:#dcfce7;color:#166534}
+  .status-mid{background:#fef3c7;color:#92400e}
+  .status-low{background:#ffe4e6;color:#9f1239}
+  .b-track{height:8px;background:#e9eef5;border-radius:999px;overflow:hidden}
+  .b-fill{height:100%;border-radius:999px;transition:width .45s ease}
+
+  .tips{
+    margin-top:20px;
+    text-align:left;
+    background:#f8fbff;
+    border:1px solid #cfe0ff;
+    border-left:5px solid var(--blue);
+    border-radius:11px;
+    padding:16px;
+  }
+  .tips h3{margin:0 0 10px;color:var(--navy);font-size:1rem}
+  .tips ol{margin:0;padding-left:20px}
+  .tips li{margin:9px 0;color:#475467;font-size:.88rem;line-height:1.5}
+
+  .share-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  .share-message{min-height:18px;margin:8px 0 0;color:var(--green);font-size:.78rem;font-weight:700}
+
+  .cta{
+    background:linear-gradient(135deg,var(--navy-2),var(--blue));
+    color:#fff;
+    padding:20px;
+    border-radius:14px;
+    margin-top:22px;
+    text-align:center;
+  }
+  .cta p{margin:0 0 12px;color:#fff;font-size:.92rem;line-height:1.45}
+  .cta a{display:inline-flex;align-items:center;justify-content:center;min-height:46px;background:#fff;color:var(--navy);padding:10px 17px;border-radius:9px;text-decoration:none;font-size:.86rem;font-weight:800}
+  .retry{margin-top:16px}
+  .retry button{border:0;background:transparent;color:var(--blue-dark);text-decoration:underline;cursor:pointer;padding:9px;font-size:.84rem;font-weight:700}
+
+  .disclaimer{margin:16px 2px 0;color:var(--muted);font-size:.72rem;line-height:1.45;text-align:center}
+  .toast{position:fixed;z-index:50;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,20px);max-width:calc(100% - 28px);background:#172033;color:#fff;border-radius:10px;padding:11px 15px;opacity:0;pointer-events:none;transition:.2s ease;font-size:.83rem;text-align:center;box-shadow:var(--shadow)}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media(max-width:560px){
+    body{padding:9px 9px calc(34px + env(safe-area-inset-bottom))}
+    .hero{border-radius:16px;padding:21px 17px;margin-bottom:12px}
+    .hero-meta{gap:7px 12px}
+    .card{padding:16px;border-radius:14px}
+    .question-meta{align-items:flex-start}
+    .question-category{max-width:55%}
+    .option{min-height:62px;padding:12px}
+    .nav-row{position:sticky;bottom:8px;z-index:5;margin:18px -5px -5px;padding:7px;background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:12px;box-shadow:0 7px 20px rgba(23,54,93,.12);backdrop-filter:blur(7px)}
+    .result-grid{grid-template-columns:1fr}
+    .share-row{grid-template-columns:1fr}
+  }
+
+  @media(max-width:360px){
+    .nav-row{grid-template-columns:94px minmax(0,1fr)}
+    .btn{padding-left:11px;padding-right:11px}
+    .hero-meta{display:grid;gap:5px}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{transition:none!important;animation:none!important}
+  }
+</style>
+
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://www.arabanekadaryakar.com/p/surus-skor-testi.html">
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">🚗 Kısa sürüş alışkanlığı testi</div>
+      <h1>Sürüş Skorunuz Kaç?</h1>
+      <p>8 günlük kullanım sorusunu yanıtlayın. Yakıt veya enerji tüketimini etkileyebilecek güçlü yönlerinizi ve geliştirebileceğiniz alışkanlıkları görün.</p>
+      <div class="hero-meta">
+        <span>⏱ Yaklaşık 1 dakika</span>
+        <span>🔒 Kayıt ve üyelik yok</span>
+        <span>📱 Mobil uyumlu</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="progress-panel" id="progressPanel" aria-label="Test ilerlemesi">
+    <div class="progress-head">
+      <strong id="progressText">Soru 1 / 8</strong>
+      <span id="progressPercent">%0 tamamlandı</span>
+    </div>
+    <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </section>
+
+  <div id="quizArea" aria-live="polite"></div>
+
+  <section class="card result" id="resultCard" aria-labelledby="resultTitle">
+    <div class="result-kicker">Test tamamlandı</div>
+    <h2 id="resultTitle">Sürüş verimliliği skorunuz</h2>
+
+    <div class="score-ring-wrap" aria-label="Sürüş skoru">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="#e9eef5" stroke-width="12"/>
+        <circle id="scoreCircle" cx="60" cy="60" r="52" fill="none" stroke="#2563eb" stroke-width="12"
+          stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"
+          transform="rotate(-90 60 60)"/>
+      </svg>
+      <div class="score-value">
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-denom">100 üzerinden</div>
+      </div>
+    </div>
+
+    <div class="score-label" id="scoreLabel"></div>
+    <p class="score-sub" id="scoreSub"></p>
+
+    <div class="result-grid">
+      <div class="insight-card good">
+        <h3>✅ Güçlü yönleriniz</h3>
+        <ul id="strengthList"></ul>
+      </div>
+      <div class="insight-card focus">
+        <h3>🎯 Öncelikli alanlar</h3>
+        <ul id="focusList"></ul>
+      </div>
+    </div>
+
+    <h3 class="section-title">Tüm cevapların özeti</h3>
+    <div class="breakdown" id="breakdown"></div>
+
+    <div class="tips">
+      <h3>Uygulanabilir öneriler</h3>
+      <ol id="tipsList"></ol>
+    </div>
+
+    <div class="share-row">
+      <button type="button" class="btn btn-primary" id="shareBtn">Sonucumu Paylaş</button>
+      <button type="button" class="btn btn-secondary" id="reviewBtn">Cevapları Gözden Geçir</button>
+    </div>
+    <div class="share-message" id="shareMessage" aria-live="polite"></div>
+
+    <div class="cta">
+      <p><strong>Bu alışkanlıkların bütçenize etkisini görün.</strong><br>Aracınız ve mesafenizle güncel yol maliyetini hesaplayın.</p>
+      <a href="https://www.arabanekadaryakar.com/" target="_blank" rel="noopener">Yakıt / Enerji Maliyeti Hesapla</a>
+    </div>
+
+    <div class="retry"><button type="button" id="restartBtn">🔄 Testi baştan çöz</button></div>
+    <p class="disclaimer">Bu test, verdiğiniz yanıtlara dayalı genel bir farkındalık değerlendirmesidir. Gerçek tüketim; araç, trafik, yol, hava, bakım ve kullanım koşullarına göre değişir.</p>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  const STATE_KEY = 'drivingScoreQuizStateV2';
+  const questions = [
+    {
+      id:'hizlanma',
+      category:'Hızlanma',
+      text:'Trafik ışığı yeşile döndüğünde genellikle nasıl hızlanırsınız?',
+      options:[
+        {text:'Hızlı ve sert biçimde gaza basarım',points:0},
+        {text:'Orta tempoda hızlanırım',points:2},
+        {text:'Yumuşak ve kademeli hızlanırım',points:3}
+      ]
+    },
+    {
+      id:'fren',
+      category:'Yavaşlama ve fren',
+      text:'İleride durmanız gerekeceğini fark ettiğinizde ne yaparsınız?',
+      options:[
+        {text:'Son ana kadar ilerleyip sert fren yaparım',points:0},
+        {text:'Biraz önceden yavaşlamaya başlarım',points:2},
+        {text:'Erken fark edip gazı bırakır, kontrollü yaklaşırım',points:3}
+      ]
+    },
+    {
+      id:'hiz',
+      category:'Seyir hızı',
+      text:'Trafik ve hız sınırları uygun olduğunda otoyolda genellikle hangi hız aralığında seyredersiniz?',
+      options:[
+        {text:'Genellikle 130 km/s ve üzeri',points:0},
+        {text:'Genellikle 110–130 km/s arası',points:1},
+        {text:'Genellikle 90–110 km/s arası',points:3}
+      ]
+    },
+    {
+      id:'lastik',
+      category:'Lastik basıncı',
+      text:'Lastik basınçlarını ne sıklıkla kontrol edersiniz?',
+      options:[
+        {text:'Neredeyse hiç kontrol etmem veya hatırlamıyorum',points:0},
+        {text:'Birkaç ayda bir kontrol ederim',points:2},
+        {text:'Yaklaşık ayda bir ve uzun yol öncesinde kontrol ederim',points:3}
+      ]
+    },
+    {
+      id:'klima',
+      category:'Klima ve cam',
+      text:'Sıcak havada hızlı bir yolda giderken genellikle ne yaparsınız?',
+      options:[
+        {text:'Camları açık tutarım, klimayı kullanmam',points:1},
+        {text:'Camları kapatır, klimayı makul ayarda kullanırım',points:3},
+        {text:'Klimayı sürekli en düşük sıcaklıkta çalıştırırım',points:1}
+      ]
+    },
+    {
+      id:'yuk',
+      category:'Gereksiz yük',
+      text:'Aracınızda kullanmadığınız eşya veya tavan taşıyıcı bulundurur musunuz?',
+      options:[
+        {text:'Evet, çoğu zaman gereksiz eşya veya ekipman bulunur',points:0},
+        {text:'Bazen bulunur',points:2},
+        {text:'Hayır, kullanmadığım yükleri araçta tutmam',points:3}
+      ]
+    },
+    {
+      id:'cruise',
+      category:'Hız sabitleyici',
+      text:'Hız sabitleyiciyi hangi koşullarda kullanırsınız?',
+      options:[
+        {text:'Yol ve hava koşullarına fazla bakmadan kullanırım',points:0},
+        {text:'Uygun, kuru ve akıcı yollarda kontrollü kullanırım',points:3},
+        {text:'Kullanmam veya aracımda bu özellik yok',points:1}
+      ]
+    },
+    {
+      id:'bakim',
+      category:'Bakım ve rölanti',
+      text:'Periyodik bakım ve gereksiz rölanti konusunda hangisi size daha yakın?',
+      options:[
+        {text:'Bakımı geciktirebilirim ve uzun süre rölantide beklerim',points:0},
+        {text:'Bakımı zamanında yaptırırım ancak rölantiye pek dikkat etmem',points:2},
+        {text:'Bakımları takip eder, gereksiz rölantiden kaçınırım',points:3}
+      ]
+    }
+  ];
+
+  const tips = {
+    hizlanma:'Kalkışta gaz pedalına kademeli basın. Hedef hıza sakin biçimde çıkmak, gereksiz tüketimi ve ani ivmelenmeyi azaltır.',
+    fren:'Trafiği ileriden okuyun. Kırmızı ışık veya yavaşlayan trafiği erken fark ederek gazı bırakmak, sert fren ve yeniden hızlanma döngüsünü azaltır.',
+    hiz:'Yasal hız sınırları ve trafik koşulları içinde daha dengeli bir seyir hızı seçin. Hız yükseldikçe hava direnci ve tüketim belirgin biçimde artabilir.',
+    lastik:'Basıncı lastikler soğukken, üreticinin kapı içi veya kullanım kılavuzundaki değerlerine göre kontrol edin. Uzun yol öncesi kontrolü ihmal etmeyin.',
+    klima:'Yüksek hızda camları kapalı tutup klimayı makul sıcaklıkta kullanın. Aracı ilk çalıştırdığınızda kısa süre havalandırmak da yardımcı olabilir.',
+    yuk:'Bagajdaki kullanılmayan ağır eşyaları ve ihtiyaç olmayan tavan ekipmanını çıkarın. Araçta sürekli taşınan yük tüketimi artırabilir.',
+    cruise:'Hız sabitleyiciyi görüşün, yolun ve havanın uygun olduğu akıcı güzergâhlarda kullanın. Yoğun trafik, kaygan yol ve keskin virajlarda sürüş kontrolünü önceliklendirin.',
+    bakim:'Periyodik bakım tarihlerini takip edin. Uzun beklemelerde güvenli ve uygun olduğu durumlarda gereksiz rölantiden kaçının.'
+  };
+
+  let current = 0;
+  let answers = new Array(questions.length).fill(null);
+
+  const $ = function(id){ return document.getElementById(id); };
+
+  function escapeHtml(value){
+    return String(value == null ? '' : value).replace(/[&<>"']/g,function(char){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];
+    });
+  }
+
+  function notify(message){
+    const toast = $('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(notify.timer);
+    notify.timer = setTimeout(function(){ toast.classList.remove('show'); },2200);
+  }
+
+  function saveState(){
+    try{
+      sessionStorage.setItem(STATE_KEY,JSON.stringify({current:current,answers:answers}));
+    }catch(err){
+      console.warn('Test durumu kaydedilemedi.',err);
+    }
+  }
+
+  function loadState(){
+    try{
+      const raw = sessionStorage.getItem(STATE_KEY);
+      if(!raw) return;
+      const state = JSON.parse(raw);
+      if(Array.isArray(state.answers) && state.answers.length === questions.length){
+        answers = state.answers.map(function(value,index){
+          return Number.isInteger(value) && questions[index].options[value] ? value : null;
+        });
+      }
+      if(Number.isInteger(state.current) && state.current >= 0 && state.current < questions.length){
+        current = state.current;
+      }
+    }catch(err){
+      console.warn('Test durumu okunamadı.',err);
+    }
+  }
+
+  function answeredCount(){
+    return answers.filter(function(value){ return value !== null; }).length;
+  }
+
+  function updateProgress(isFinished){
+    const completed = isFinished ? questions.length : answeredCount();
+    const percent = Math.round((completed / questions.length) * 100);
+    $('progressText').textContent = isFinished ? 'Test tamamlandı' : 'Soru ' + (current + 1) + ' / ' + questions.length;
+    $('progressPercent').textContent = '%' + percent + ' tamamlandı';
+    $('progressFill').style.width = percent + '%';
+    $('progressTrack').setAttribute('aria-valuenow',String(percent));
+  }
+
+  function renderQuestion(shouldFocus){
+    const q = questions[current];
+    const selectedAnswer = answers[current];
+    const optionsHtml = q.options.map(function(option,index){
+      const selected = selectedAnswer === index;
+      return '<button type="button" class="option' + (selected ? ' selected' : '') + '" data-option="' + index + '" role="radio" aria-checked="' + selected + '">' +
+        '<span class="option-mark" aria-hidden="true">' + (selected ? '✓' : '') + '</span>' +
+        '<span class="option-text">' + escapeHtml(option.text) + '</span>' +
+      '</button>';
+    }).join('');
+
+    $('quizArea').innerHTML =
+      '<section class="card" id="questionCard" aria-labelledby="questionTitle">' +
+        '<div class="question-meta">' +
+          '<div class="question-count">Soru ' + (current + 1) + ' / ' + questions.length + '</div>' +
+          '<div class="question-category">' + escapeHtml(q.category) + '</div>' +
+        '</div>' +
+        '<h2 class="question-text" id="questionTitle">' + escapeHtml(q.text) + '</h2>' +
+        '<p class="question-help">Günlük kullanımınıza en yakın seçeneği işaretleyin.</p>' +
+        '<div class="options" id="optionsWrap" role="radiogroup" aria-labelledby="questionTitle">' + optionsHtml + '</div>' +
+        '<div class="nav-row">' +
+          '<button type="button" class="btn btn-ghost" id="prevBtn"' + (current === 0 ? ' disabled' : '') + '>← Geri</button>' +
+          '<button type="button" class="btn btn-primary" id="nextBtn"' + (selectedAnswer === null ? ' disabled' : '') + '>' +
+            (current === questions.length - 1 ? 'Sonucu Gör' : 'Devam Et →') +
+          '</button>' +
+        '</div>' +
+        '<p class="answer-note">' + (selectedAnswer === null ? 'Bir seçenek işaretleyin.' : 'Seçiminiz kaydedildi; isterseniz değiştirebilirsiniz.') + '</p>' +
+      '</section>';
+
+    $('optionsWrap').addEventListener('click',function(event){
+      const button = event.target.closest('[data-option]');
+      if(!button) return;
+      selectOption(Number(button.getAttribute('data-option')));
+    });
+    $('prevBtn').addEventListener('click',prevQuestion);
+    $('nextBtn').addEventListener('click',nextQuestion);
+
+    updateProgress(false);
+    saveState();
+
+    if(shouldFocus){
+      const title = $('questionTitle');
+      title.setAttribute('tabindex','-1');
+      title.focus({preventScroll:true});
+      $('questionCard').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  }
+
+  function selectOption(index){
+    if(!questions[current].options[index]) return;
+    answers[current] = index;
+    renderQuestion(false);
+    const nextButton = $('nextBtn');
+    if(nextButton) nextButton.focus({preventScroll:true});
+  }
+
+  function nextQuestion(){
+    if(answers[current] === null){
+      notify('Devam etmek için bir seçenek işaretleyin.');
+      return;
+    }
+    if(current < questions.length - 1){
+      current += 1;
+      renderQuestion(true);
+    }else{
+      showResult();
+    }
+  }
+
+  function prevQuestion(){
+    if(current > 0){
+      current -= 1;
+      renderQuestion(true);
+    }
+  }
+
+  function scoreStatus(points){
+    if(points >= 3) return {label:'İyi',className:'status-good',color:'#15803d'};
+    if(points >= 2) return {label:'Orta',className:'status-mid',color:'#d97706'};
+    return {label:'Geliştirilebilir',className:'status-low',color:'#c2413b'};
+  }
+
+  function getResultCopy(score,label){
+    return 'Sürüş verimliliği testinde ' + score + '/100 puan aldım: ' + label.replace(/^[^\p{L}\p{N}]+/u,'') + '. Sen de sürüş skorunu öğren: https://www.arabanekadaryakar.com/p/surus-skor-testi.html';
+  }
+
+  function showResult(){
+    if(answers.some(function(value){ return value === null; })){
+      const firstMissing = answers.findIndex(function(value){ return value === null; });
+      current = firstMissing;
+      renderQuestion(true);
+      notify('Sonucu görmek için tüm soruları yanıtlayın.');
+      return;
+    }
+
+    const categoryScores = questions.map(function(question,index){
+      const points = question.options[answers[index]].points;
+      return {id:question.id,category:question.category,points:points,max:3};
+    });
+    const total = categoryScores.reduce(function(sum,item){ return sum + item.points; },0);
+    const max = questions.length * 3;
+    const score = Math.round((total / max) * 100);
+
+    let label;
+    let description;
+    let color;
+    if(score >= 85){
+      label = '🏆 Çok Verimli Sürüş';
+      description = 'Yanıtlarınıza göre tüketimi etkileyen temel alışkanlıkların büyük bölümünü bilinçli uyguluyorsunuz. Tutarlılığı korumanız yeterli.';
+      color = '#15803d';
+    }else if(score >= 65){
+      label = '✅ Verimli Sürüş';
+      description = 'Genel yaklaşımınız iyi. Birkaç alışkanlığı daha düzenli hâle getirerek sürüşünüzü daha ekonomik ve dengeli yapabilirsiniz.';
+      color = '#2563eb';
+    }else if(score >= 40){
+      label = '⚙️ Geliştirilebilir Sürüş';
+      description = 'Bazı doğru alışkanlıklarınız var; ancak birkaç günlük kullanım tercihi tüketimi gereksiz biçimde artırıyor olabilir.';
+      color = '#b45309';
+    }else{
+      label = '🔧 Yüksek Tasarruf Potansiyeli';
+      description = 'Yanıtlarınıza göre küçük ve uygulanabilir değişikliklerle sürüş verimliliğinizi belirgin biçimde geliştirme alanınız bulunuyor.';
+      color = '#c2413b';
+    }
+
+    const circumference = 326.7;
+    $('scoreCircle').style.strokeDashoffset = String(circumference - (score / 100) * circumference);
+    $('scoreCircle').style.stroke = color;
+    $('scoreNum').textContent = String(score);
+    $('scoreLabel').textContent = label;
+    $('scoreLabel').style.color = color;
+    $('scoreSub').textContent = description;
+
+    const sortedBest = categoryScores.slice().sort(function(a,b){ return b.points - a.points; });
+    const strengths = sortedBest.filter(function(item){ return item.points >= 2; }).slice(0,3);
+    const sortedWeak = categoryScores.slice().sort(function(a,b){ return a.points - b.points; });
+    const focusAreas = sortedWeak.filter(function(item){ return item.points < 3; }).slice(0,3);
+
+    $('strengthList').innerHTML = (strengths.length ? strengths : sortedBest.slice(0,2)).map(function(item){
+      return '<li>' + escapeHtml(item.category) + '</li>';
+    }).join('');
+    $('focusList').innerHTML = (focusAreas.length ? focusAreas : [{category:'Mevcut iyi alışkanlıkları sürdürme'}]).map(function(item){
+      return '<li>' + escapeHtml(item.category) + '</li>';
+    }).join('');
+
+    $('breakdown').innerHTML = categoryScores.map(function(item){
+      const percent = Math.round((item.points / item.max) * 100);
+      const status = scoreStatus(item.points);
+      return '<div class="b-row">' +
+        '<div class="b-title"><strong>' + escapeHtml(item.category) + '</strong><span class="status-pill ' + status.className + '">' + status.label + '</span></div>' +
+        '<div class="b-track" aria-label="' + escapeHtml(item.category) + ' puanı yüzde ' + percent + '"><div class="b-fill" style="width:' + percent + '%;background:' + status.color + '"></div></div>' +
+      '</div>';
+    }).join('');
+
+    const tipItems = sortedWeak.slice(0,3);
+    $('tipsList').innerHTML = tipItems.map(function(item){
+      return '<li><strong>' + escapeHtml(item.category) + ':</strong> ' + escapeHtml(tips[item.id]) + '</li>';
+    }).join('');
+
+    $('quizArea').style.display = 'none';
+    $('resultCard').style.display = 'block';
+    updateProgress(true);
+    sessionStorage.removeItem(STATE_KEY);
+
+    $('shareBtn').onclick = function(){ shareResult(score,label); };
+    $('reviewBtn').onclick = reviewAnswers;
+    $('restartBtn').onclick = restartQuiz;
+
+    $('resultCard').scrollIntoView({behavior:'smooth',block:'start'});
+    $('resultTitle').setAttribute('tabindex','-1');
+    $('resultTitle').focus({preventScroll:true});
+  }
+
+  async function shareResult(score,label){
+    const text = getResultCopy(score,label);
+    try{
+      if(navigator.share){
+        await navigator.share({title:'Sürüş Skorum',text:text,url:'https://www.arabanekadaryakar.com/p/surus-skor-testi.html'});
+        $('shareMessage').textContent = 'Paylaşım ekranı açıldı.';
+      }else if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(text);
+        $('shareMessage').textContent = 'Sonuç metni panoya kopyalandı.';
+      }else{
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+        $('shareMessage').textContent = 'Sonuç metni panoya kopyalandı.';
+      }
+    }catch(err){
+      if(err && err.name === 'AbortError') return;
+      $('shareMessage').textContent = 'Paylaşım açılamadı. Tekrar deneyin.';
+    }
+  }
+
+  function reviewAnswers(){
+    current = 0;
+    $('resultCard').style.display = 'none';
+    $('quizArea').style.display = 'block';
+    $('shareMessage').textContent = '';
+    renderQuestion(true);
+  }
+
+  function restartQuiz(){
+    current = 0;
+    answers = new Array(questions.length).fill(null);
+    sessionStorage.removeItem(STATE_KEY);
+    $('resultCard').style.display = 'none';
+    $('quizArea').style.display = 'block';
+    $('shareMessage').textContent = '';
+    renderQuestion(true);
+  }
+
+  loadState();
+  renderQuestion(false);
+})();
+</script>
+
+<script>
+(function(){
+  'use strict';
+  var targetOrigin = 'https://www.arabanekadaryakar.com';
+  var lastHeight = 0;
+  var timer = null;
+
+  function reportHeight(){
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      var body = document.body;
+      var doc = document.documentElement;
+      var height = Math.max(
+        body ? body.scrollHeight : 0,
+        body ? body.offsetHeight : 0,
+        doc ? doc.scrollHeight : 0,
+        doc ? doc.offsetHeight : 0,
+        doc ? doc.clientHeight : 0
+      );
+
+      if(!height || Math.abs(height - lastHeight) < 2) return;
+      lastHeight = height;
+
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({
+          type: 'nky-iframe-height',
+          height: height
+        }, targetOrigin);
+      }
+    }, 60);
+  }
+
+  window.addEventListener('load', reportHeight);
+  window.addEventListener('resize', reportHeight);
+
+  if('ResizeObserver' in window){
+    var observer = new ResizeObserver(reportHeight);
+    observer.observe(document.documentElement);
+    if(document.body) observer.observe(document.body);
+  }else{
+    setInterval(reportHeight, 800);
+  }
+
+  setTimeout(reportHeight, 150);
+  setTimeout(reportHeight, 700);
+  setTimeout(reportHeight, 1600);
+})();
+</script>
+
+</body>
+</html>

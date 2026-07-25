@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e3a5f">
+<title>Yakıt Günlüğü | arabanekadaryakar.com</title>
+<style>
+  :root{
+    --navy:#17365d;--blue:#2563eb;--blue-dark:#1d4ed8;--blue-light:#eff6ff;
+    --green:#15803d;--green-light:#ecfdf3;--amber:#b45309;--amber-light:#fffbeb;
+    --red:#dc2626;--red-light:#fff1f2;--bg:#f4f7fb;--card:#fff;
+    --border:#dbe3ee;--text:#172033;--muted:#667085;--shadow:0 8px 24px rgba(23,54,93,.08);
+  }
+  *{box-sizing:border-box}
+  html{color-scheme:light;scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;padding:18px 14px 56px}
+  button,input,select,textarea{font:inherit}
+  button{-webkit-tap-highlight-color:transparent}
+  .wrap{width:100%;max-width:900px;margin:0 auto}
+  .header{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:18px;padding:26px 22px;text-align:center;margin-bottom:18px;box-shadow:var(--shadow)}
+  .header h1{margin:0 0 8px;font-size:clamp(1.35rem,4vw,1.8rem)}
+  .header p{max-width:670px;margin:0 auto;opacity:.94;font-size:.93rem;line-height:1.55}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:var(--shadow)}
+  .card-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px}
+  .card h2{margin:0;color:var(--navy);font-size:1.08rem}
+  .record-count{background:var(--blue-light);color:var(--blue-dark);border-radius:999px;padding:5px 10px;font-size:.75rem;font-weight:700;white-space:nowrap}
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .form-group{display:flex;min-width:0;flex-direction:column;gap:6px}
+  .form-group.full{grid-column:1/-1}
+  label{color:#475467;font-size:.84rem;font-weight:700}
+  .optional{color:var(--muted);font-size:.76rem;font-weight:400}
+  input,select,textarea{width:100%;min-height:48px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text);padding:11px 12px}
+  textarea{min-height:88px;line-height:1.45;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:3px solid rgba(37,99,235,.13);border-color:var(--blue)}
+  .date-row{display:grid;grid-template-columns:.72fr 1.35fr 1fr;gap:8px}
+  .field-help,.date-help,.note{margin:2px 0 0;color:var(--muted);font-size:.76rem;line-height:1.45}
+  .calculation-info{margin:15px 0 0;padding:12px 13px;border:1px solid #bfdbfe;border-radius:11px;background:var(--blue-light);color:#334155;font-size:.79rem;line-height:1.5}
+  .calculation-info strong{color:var(--navy)}
+  .form-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-top:16px}
+  .btn{border:0;border-radius:10px;min-height:46px;padding:11px 18px;font-weight:700;cursor:pointer}
+  .btn-primary{background:var(--blue);color:#fff}
+  .btn-primary:hover{background:var(--blue-dark)}
+  .btn-primary:active,.btn-secondary:active,.btn-danger:active,.btn-edit:active{transform:translateY(1px)}
+  .btn-secondary{background:#f8fafc;color:#475467;border:1px solid var(--border)}
+  .btn-danger{min-height:38px;background:var(--red-light);color:var(--red);border:1px solid #fecdd3;padding:7px 12px;font-size:.82rem}
+  .btn-edit{min-height:38px;background:var(--blue-light);color:var(--blue-dark);border:1px solid #bfdbfe;padding:7px 12px;font-size:.82rem}
+  .summary-card{padding:18px;margin-bottom:18px}
+  .period-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:5px;background:#eef2f7;border:1px solid var(--border);border-radius:12px;margin-bottom:14px}
+  .period-btn{min-height:42px;border:0;border-radius:9px;background:transparent;color:#475467;font-size:.84rem;font-weight:700;cursor:pointer}
+  .period-btn.active{background:#fff;color:var(--blue-dark);box-shadow:0 2px 8px rgba(23,54,93,.1)}
+  .period-caption{text-align:center;color:var(--muted);font-size:.77rem;margin:0 0 12px}
+  .summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .summary-box{min-width:0;background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center}
+  .summary-box .val{overflow-wrap:anywhere;color:var(--navy);font-size:clamp(1rem,4vw,1.35rem);font-weight:800;line-height:1.25}
+  .summary-box .lbl{margin-top:5px;color:var(--muted);font-size:.76rem;line-height:1.35}
+  .summary-empty{margin:12px 0 0;text-align:center;color:var(--amber);font-size:.78rem}
+  .chart-group+.chart-group{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+  .chart-heading{margin:0 0 7px;color:#475467;font-size:.82rem;font-weight:700;text-align:center}
+  .chart-note{margin:10px 0 0;text-align:center;color:var(--muted);font-size:.76rem;line-height:1.4}
+  .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+  table{width:100%;border-collapse:collapse;font-size:.81rem;min-width:980px}
+  th{background:var(--navy);color:#fff;padding:10px 8px;text-align:left;white-space:nowrap}
+  td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+  tbody tr:last-child td{border-bottom:0}
+  tr:nth-child(even) td{background:#f8fafc}
+  .desc-cell{max-width:190px;white-space:normal;overflow-wrap:anywhere;color:#475467}
+  .result-ok{color:var(--green);font-weight:700}
+  .result-note{color:var(--amber);font-size:.75rem;line-height:1.35}
+  .row-actions{display:flex;gap:6px}
+  .mobile-list{display:none}
+  .fill-card{border:1px solid var(--border);border-radius:13px;padding:14px;background:#fff}
+  .fill-card+.fill-card{margin-top:10px}
+  .fill-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .fill-date{font-weight:800;color:var(--navy)}
+  .fuel-badge{display:inline-flex;margin-top:4px;background:var(--blue-light);color:var(--blue-dark);border-radius:999px;padding:4px 8px;font-size:.74rem;font-weight:700}
+  .card-actions{display:flex;gap:6px}
+  .fill-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .fill-stat{background:#f8fafc;border-radius:9px;padding:9px;min-width:0}
+  .fill-stat.wide{grid-column:1/-1}
+  .fill-stat span{display:block;color:var(--muted);font-size:.7rem;margin-bottom:3px}
+  .fill-stat strong{display:block;font-size:.88rem;overflow-wrap:anywhere;line-height:1.35}
+  .consumption-ok{background:var(--green-light);border:1px solid #bbf7d0}
+  .consumption-note{background:var(--amber-light);border:1px solid #fde68a}
+  .fill-desc{margin:11px 0 0;padding-top:10px;border-top:1px solid var(--border);color:#475467;font-size:.83rem;line-height:1.45;overflow-wrap:anywhere}
+  .empty-state{text-align:center;padding:28px 10px;color:var(--muted)}
+  .empty-state .big{font-size:2.35rem;margin-bottom:8px}
+  .empty-state p{margin:0;line-height:1.5}
+  .privacy-note{margin:0 0 18px;padding:11px 13px;border:1px solid var(--border);border-radius:11px;background:#fff;color:var(--muted);font-size:.76rem;line-height:1.45;text-align:center}
+  .cta{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:20px;border-radius:14px;text-align:center}
+  .cta p{margin:0 0 10px;color:#fff;font-size:.93rem}
+  .cta a{display:inline-block;background:#fff;color:var(--navy);padding:10px 17px;border-radius:8px;text-decoration:none;font-size:.9rem;font-weight:700}
+  .toast{position:fixed;z-index:20;left:50%;bottom:22px;transform:translate(-50%,20px);max-width:calc(100% - 28px);background:#172033;color:#fff;border-radius:10px;padding:11px 16px;opacity:0;pointer-events:none;transition:.2s ease;font-size:.86rem;text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  [hidden]{display:none!important}
+  @media(max-width:680px){
+    body{padding:10px 10px 38px}
+    .header{padding:21px 16px;border-radius:15px}
+    .card{padding:16px;border-radius:14px}
+    .summary-card{padding:14px}
+    .form-grid{grid-template-columns:1fr}
+    .form-group.full{grid-column:auto}
+    .summary-grid{grid-template-columns:1fr 1fr}
+    .summary-box:first-child{grid-column:1/-1}
+    .desktop-table{display:none}
+    .mobile-list{display:block}
+    .btn{min-height:48px}
+    .btn-edit,.btn-danger{min-height:40px;padding:7px 10px}
+    .form-actions{grid-template-columns:1fr}
+    .form-actions .btn-secondary{order:2}
+  }
+  @media(max-width:390px){
+    .date-row{grid-template-columns:.68fr 1.25fr .95fr;gap:5px}
+    input,select,textarea{padding-left:9px;padding-right:9px}
+    .period-btn{font-size:.78rem;padding:8px 4px}
+    .fill-grid{gap:8px}
+    .card-actions{flex-direction:column}
+  }
+</style>
+
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://www.arabanekadaryakar.com/p/yakt-gunlugu.html">
+</head>
+<body>
+<main class="wrap">
+  <header class="header">
+    <h1>📒 Yakıt Günlüğü</h1>
+    <p>Dolumlarınızı kaydedin; bu ay, bu yıl ve toplam harcamanızı görün. Kilometre bilgisi bulunan ardışık kayıtlarla gerçek tüketiminizi takip edin.</p>
+  </header>
+
+  <section class="card" aria-labelledby="newFillTitle" id="formCard">
+    <div class="card-title">
+      <h2 id="newFillTitle">➕ Yeni Dolum Ekle</h2>
+    </div>
+    <form id="fillForm" novalidate>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Tarih <span class="optional">(GG.AA.YYYY)</span></label>
+          <div class="date-row">
+            <select id="f-day" aria-label="Gün" required></select>
+            <select id="f-month" aria-label="Ay" required></select>
+            <select id="f-year" aria-label="Yıl" required></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="f-fuel">Yakıt / Enerji Türü</label>
+          <select id="f-fuel">
+            <option value="Benzin">Benzin</option>
+            <option value="Dizel">Dizel</option>
+            <option value="LPG">LPG</option>
+            <option value="Elektrik">Elektrik</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="f-km">Araç Kilometresi <span class="optional">(isteğe bağlı)</span></label>
+          <input type="text" inputmode="numeric" autocomplete="off" id="f-km" placeholder="Örn. 45200 veya 45.200">
+          <p class="field-help">Tüketim hesabı için göstergedeki toplam kilometreyi girin.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="f-amount" id="amountLabel">Alınan Yakıt (Litre)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="f-amount" placeholder="Örn. 42,5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="f-cost">Ödenen Toplam Tutar (TL)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="f-cost" placeholder="Örn. 1850 veya 1.850" required>
+        </div>
+
+        <div class="form-group full">
+          <label for="f-note">Açıklama <span class="optional">(isteğe bağlı)</span></label>
+          <textarea id="f-note" maxlength="240" placeholder="Örn. Uzun yol öncesi tam depo, şehir içi kullanım, farklı istasyon…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" id="saveButton" type="submit">Dolumu Kaydet</button>
+        <button class="btn btn-secondary" id="cancelEditButton" type="button" hidden>Düzenlemeyi İptal Et</button>
+      </div>
+
+      <div class="calculation-info">
+        <strong>Tüketim nasıl hesaplanır?</strong> İlk kilometreli kayıt başlangıç noktasıdır; bu nedenle tek başına tüketim üretmez. Aynı yakıt türünde ikinci ve sonraki kilometreli kayıtlarda, iki dolum arasındaki mesafe kullanılarak L/100 km veya kWh/100 km hesabı yapılır. Daha doğru sonuç için dolumları benzer depo/şarj seviyesinde kaydedin.
+      </div>
+    </form>
+  </section>
+
+  <section class="card summary-card" id="summaryArea" aria-live="polite" hidden></section>
+
+  <section class="card" id="chartCard" hidden>
+    <div class="card-title"><h2>📈 Tüketim Trendi</h2></div>
+    <div id="chartWrap"></div>
+    <p class="chart-note">Grafik, aynı yakıt/enerji türünde hesaplanabilen en az iki tüketim sonucu olduğunda gösterilir.</p>
+  </section>
+
+  <section class="card" aria-labelledby="historyTitle">
+    <div class="card-title">
+      <h2 id="historyTitle">📋 Dolum Geçmişi</h2>
+      <span class="record-count" id="recordCount">0 kayıt</span>
+    </div>
+    <div id="historyArea"></div>
+  </section>
+
+  <p class="privacy-note">Kayıtlarınız yalnızca bu tarayıcıda saklanır. Tarayıcı verileri silinirse kayıtlar da silinebilir.</p>
+
+  <aside class="cta">
+    <p><strong>Güncel fiyatlarla toplam yol maliyetinizi hesaplayın</strong></p>
+    <a href="https://www.arabanekadaryakar.com/" target="_blank" rel="noopener">Yakıt Maliyeti Hesaplama Aracını Kullan</a>
+  </aside>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  const STORAGE_KEY = 'fuelLogEntries';
+  const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const PERIOD_LABELS = { month:'Bu ay', year:'Bu yıl', all:'Toplam' };
+  const $ = function(id){ return document.getElementById(id); };
+  const trNumber = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 });
+  const trMoney = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  let entries = [];
+  let activePeriod = 'month';
+  let editingId = null;
+
+  function uid(){
+    return 'f_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+  }
+
+  function esc(value){
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function localISODate(date){
+    const d = date || new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function parseLocalDate(value){
+    const parts = String(value || '').split('-').map(Number);
+    return new Date(parts[0] || 1970, (parts[1] || 1)-1, parts[2] || 1);
+  }
+
+  function formatDate(value){
+    const d = parseLocalDate(value);
+    return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('tr-TR');
+  }
+
+  function unitForFuel(fuel){
+    return fuel === 'Elektrik' ? 'kWh' : 'L';
+  }
+
+  function consumptionUnitForFuel(fuel){
+    return fuel === 'Elektrik' ? 'kWh/100 km' : 'L/100 km';
+  }
+
+  function parseTurkishNumber(raw, integerOnly){
+    let value = String(raw == null ? '' : raw).trim();
+    if(!value) return null;
+
+    value = value.replace(/\s/g,'').replace(/₺|TL/gi,'').replace(/[^0-9,.-]/g,'');
+    if(!value || value === '-' || value === ',' || value === '.') return NaN;
+
+    if(integerOnly){
+      const digits = value.replace(/\D/g,'');
+      return digits ? Number(digits) : NaN;
+    }
+
+    const commaIndex = value.lastIndexOf(',');
+    const dotIndex = value.lastIndexOf('.');
+
+    if(commaIndex > -1 && dotIndex > -1){
+      if(commaIndex > dotIndex){
+        value = value.replace(/\./g,'').replace(',','.');
+      }else{
+        value = value.replace(/,/g,'');
+      }
+    }else if(commaIndex > -1){
+      value = value.replace(/\./g,'').replace(',','.');
+    }else if(dotIndex > -1){
+      const parts = value.split('.');
+      if(parts.length > 2){
+        value = parts.join('');
+      }else if(parts[1] && parts[1].length === 3 && parts[0].length <= 3){
+        value = parts.join('');
+      }
+    }
+
+    return Number(value);
+  }
+
+  function notify(message){
+    const toast = $('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(notify.timer);
+    notify.timer = setTimeout(function(){ toast.classList.remove('show'); }, 2400);
+  }
+
+  function loadEntries(){
+    try{
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if(!Array.isArray(parsed)) return [];
+
+      return parsed.map(function(e, i){
+        const hasKm = e.km !== null && e.km !== undefined && e.km !== '' && Number.isFinite(Number(e.km)) && Number(e.km) > 0;
+        return {
+          id: e.id || uid() + '_' + i,
+          date: e.date || localISODate(),
+          fuel: ['Benzin','Dizel','LPG','Elektrik'].indexOf(e.fuel) > -1 ? e.fuel : 'Benzin',
+          km: hasKm ? Number(e.km) : null,
+          amount: Number(e.amount) || 0,
+          cost: Number(e.cost) || 0,
+          note: e.note || '',
+          createdAt: Number(e.createdAt) || Date.now() + i
+        };
+      }).filter(function(e){ return e.amount > 0 && e.cost > 0; });
+    }catch(err){
+      console.error('Kayıtlar okunamadı:', err);
+      return [];
+    }
+  }
+
+  function saveEntries(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      return true;
+    }catch(err){
+      alert('Kayıt tarayıcıya kaydedilemedi. Gizli mod veya depolama ayarlarını kontrol edin.');
+      return false;
+    }
+  }
+
+  function sortEntries(){
+    entries.sort(function(a,b){
+      return parseLocalDate(a.date) - parseLocalDate(b.date) || a.createdAt - b.createdAt;
+    });
+  }
+
+  function buildDateFields(){
+    $('f-day').innerHTML = Array.from({length:31}, function(_,i){
+      const v = i+1;
+      return '<option value="'+v+'">'+String(v).padStart(2,'0')+'</option>';
+    }).join('');
+
+    $('f-month').innerHTML = MONTHS.map(function(m,i){
+      return '<option value="'+(i+1)+'">'+m+'</option>';
+    }).join('');
+
+    const currentYear = new Date().getFullYear();
+    $('f-year').innerHTML = Array.from({length:15}, function(_,i){
+      const y = currentYear-i;
+      return '<option value="'+y+'">'+y+'</option>';
+    }).join('');
+
+    setToday();
+    [$('f-month'),$('f-year')].forEach(function(el){ el.addEventListener('change', clampDay); });
+  }
+
+  function daysInSelectedMonth(){
+    return new Date(Number($('f-year').value), Number($('f-month').value), 0).getDate();
+  }
+
+  function clampDay(){
+    const max = daysInSelectedMonth();
+    Array.prototype.forEach.call($('f-day').options, function(o){ o.disabled = Number(o.value) > max; });
+    if(Number($('f-day').value) > max) $('f-day').value = max;
+  }
+
+  function setToday(){
+    const d = new Date();
+    $('f-day').value = d.getDate();
+    $('f-month').value = d.getMonth()+1;
+    $('f-year').value = d.getFullYear();
+    clampDay();
+  }
+
+  function setDateFields(isoDate){
+    const d = parseLocalDate(isoDate);
+    $('f-day').value = d.getDate();
+    $('f-month').value = d.getMonth()+1;
+    $('f-year').value = d.getFullYear();
+    clampDay();
+  }
+
+  function selectedISODate(){
+    const y = $('f-year').value;
+    const m = String($('f-month').value).padStart(2,'0');
+    const d = String($('f-day').value).padStart(2,'0');
+    return y+'-'+m+'-'+d;
+  }
+
+  function updateAmountField(){
+    const electric = $('f-fuel').value === 'Elektrik';
+    $('amountLabel').textContent = electric ? 'Alınan Enerji (kWh)' : 'Alınan Yakıt (Litre)';
+    $('f-amount').placeholder = electric ? 'Örn. 38,4' : 'Örn. 42,5';
+  }
+
+  function resetForm(preferredFuel){
+    editingId = null;
+    $('fillForm').reset();
+    setToday();
+    const fallbackFuel = entries.length ? entries[entries.length-1].fuel : 'Benzin';
+    $('f-fuel').value = preferredFuel || fallbackFuel;
+    updateAmountField();
+    $('newFillTitle').textContent = '➕ Yeni Dolum Ekle';
+    $('saveButton').textContent = 'Dolumu Kaydet';
+    $('cancelEditButton').hidden = true;
+  }
+
+  function startEdit(id){
+    const entry = entries.find(function(e){ return e.id === id; });
+    if(!entry) return;
+
+    editingId = id;
+    setDateFields(entry.date);
+    $('f-fuel').value = entry.fuel;
+    $('f-km').value = entry.km === null ? '' : String(entry.km);
+    $('f-amount').value = String(entry.amount).replace('.',',');
+    $('f-cost').value = String(entry.cost).replace('.',',');
+    $('f-note').value = entry.note;
+    updateAmountField();
+
+    $('newFillTitle').textContent = '✏️ Dolumu Düzenle';
+    $('saveButton').textContent = 'Değişiklikleri Kaydet';
+    $('cancelEditButton').hidden = false;
+    $('formCard').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  function validateAndReadForm(){
+    const km = parseTurkishNumber($('f-km').value, true);
+    const amount = parseTurkishNumber($('f-amount').value, false);
+    const cost = parseTurkishNumber($('f-cost').value, false);
+    const date = selectedISODate();
+
+    if(parseLocalDate(date) > new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())){
+      alert('Dolum tarihi bugünden ileri bir tarih olamaz.');
+      return null;
+    }
+    if(km !== null && (!Number.isFinite(km) || km <= 0)){
+      alert('Araç kilometresini sıfırdan büyük bir sayı olarak girin veya alanı boş bırakın.');
+      $('f-km').focus();
+      return null;
+    }
+    if(!Number.isFinite(amount) || amount <= 0){
+      alert('Litre / kWh miktarını geçerli bir değer olarak girin. Örnek: 42,5');
+      $('f-amount').focus();
+      return null;
+    }
+    if(!Number.isFinite(cost) || cost <= 0){
+      alert('Toplam tutarı geçerli bir değer olarak girin. Örnek: 1850 veya 1.850');
+      $('f-cost').focus();
+      return null;
+    }
+
+    return {
+      date: date,
+      fuel: $('f-fuel').value,
+      km: km,
+      amount: amount,
+      cost: cost,
+      note: $('f-note').value.trim()
+    };
+  }
+
+  function computeRows(){
+    const previousByFuel = Object.create(null);
+
+    return entries.map(function(entry){
+      const previous = previousByFuel[entry.fuel] || null;
+      let distance = null;
+      let consumption = null;
+      let costPer100 = null;
+      let status = '';
+      let statusType = 'note';
+
+      if(entry.km === null){
+        status = 'Kilometre girilmedi';
+      }else if(!previous){
+        status = 'İlk kilometre kaydı — sonraki dolumda hesaplanır';
+        previousByFuel[entry.fuel] = entry;
+      }else if(entry.km > previous.km){
+        distance = entry.km - previous.km;
+        consumption = entry.amount / distance * 100;
+        costPer100 = entry.cost / distance * 100;
+        status = 'Hesaplandı';
+        statusType = 'ok';
+        previousByFuel[entry.fuel] = entry;
+      }else if(entry.km < previous.km){
+        status = 'Kilometre azaldı — yeni başlangıç kabul edildi';
+        previousByFuel[entry.fuel] = entry;
+      }else{
+        status = 'Kilometre önceki kayıtla aynı';
+      }
+
+      return {
+        entry: entry,
+        distance: distance,
+        consumption: consumption,
+        costPer100: costPer100,
+        unitPrice: entry.cost / entry.amount,
+        status: status,
+        statusType: statusType,
+        amountUnit: unitForFuel(entry.fuel),
+        consumptionUnit: consumptionUnitForFuel(entry.fuel)
+      };
+    });
+  }
+
+  function periodContains(entryDate, period){
+    if(period === 'all') return true;
+    const d = parseLocalDate(entryDate);
+    const now = new Date();
+    if(period === 'year') return d.getFullYear() === now.getFullYear();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }
+
+  function periodDescription(period){
+    const now = new Date();
+    if(period === 'month') return MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+    if(period === 'year') return String(now.getFullYear());
+    return 'Tüm kayıtlar';
+  }
+
+  function groupedAmountText(periodEntries){
+    const totals = { L:0, kWh:0 };
+    periodEntries.forEach(function(e){ totals[unitForFuel(e.fuel)] += e.amount; });
+    const parts = [];
+    if(totals.L > 0) parts.push(trNumber.format(totals.L) + ' L');
+    if(totals.kWh > 0) parts.push(trNumber.format(totals.kWh) + ' kWh');
+    return parts.length ? parts.join(' + ') : '0';
+  }
+
+  function groupedConsumptionText(periodRows){
+    const groups = {
+      L:{amount:0,distance:0},
+      kWh:{amount:0,distance:0}
+    };
+
+    periodRows.forEach(function(r){
+      if(r.consumption === null || !r.distance) return;
+      const unit = r.amountUnit;
+      groups[unit].amount += r.entry.amount;
+      groups[unit].distance += r.distance;
+    });
+
+    const parts = [];
+    if(groups.L.distance > 0) parts.push(trNumber.format(groups.L.amount / groups.L.distance * 100) + ' L');
+    if(groups.kWh.distance > 0) parts.push(trNumber.format(groups.kWh.amount / groups.kWh.distance * 100) + ' kWh');
+    return parts.length ? parts.join(' · ') : '—';
+  }
+
+  function renderSummary(rows){
+    const summary = $('summaryArea');
+    if(!entries.length){
+      summary.hidden = true;
+      summary.innerHTML = '';
+      return;
+    }
+
+    summary.hidden = false;
+    const periodEntries = entries.filter(function(e){ return periodContains(e.date, activePeriod); });
+    const periodRows = rows.filter(function(r){ return periodContains(r.entry.date, activePeriod); });
+    const totalSpent = periodEntries.reduce(function(sum,e){ return sum + e.cost; },0);
+
+    summary.innerHTML =
+      '<div class="period-tabs" role="group" aria-label="Özet dönemi">' +
+        ['month','year','all'].map(function(period){
+          return '<button type="button" class="period-btn '+(activePeriod === period ? 'active' : '')+'" data-period="'+period+'" aria-pressed="'+(activePeriod === period)+'">'+PERIOD_LABELS[period]+'</button>';
+        }).join('') +
+      '</div>' +
+      '<p class="period-caption">'+periodDescription(activePeriod)+'</p>' +
+      '<div class="summary-grid">' +
+        '<div class="summary-box"><div class="val">'+groupedConsumptionText(periodRows)+'</div><div class="lbl">Ortalama tüketim / 100 km</div></div>' +
+        '<div class="summary-box"><div class="val">'+trMoney.format(totalSpent)+' ₺</div><div class="lbl">Harcama</div></div>' +
+        '<div class="summary-box"><div class="val">'+groupedAmountText(periodEntries)+'</div><div class="lbl">Alınan yakıt / enerji</div></div>' +
+      '</div>' +
+      (!periodEntries.length ? '<p class="summary-empty">Bu dönemde henüz dolum kaydı yok.</p>' : '');
+
+    Array.prototype.forEach.call(summary.querySelectorAll('.period-btn'), function(button){
+      button.addEventListener('click', function(){
+        activePeriod = button.getAttribute('data-period');
+        renderSummary(rows);
+      });
+    });
+  }
+
+  function renderSingleChart(rows, amountUnit){
+    const valid = rows.filter(function(r){ return r.consumption !== null && r.amountUnit === amountUnit; });
+    if(valid.length < 2) return '';
+
+    const w = 700, h = 230, left = 46, right = 18, top = 22, bottom = 34;
+    const values = valid.map(function(r){ return r.consumption; });
+    const minValue = Math.min.apply(null, values);
+    const maxValue = Math.max.apply(null, values);
+    const padding = Math.max((maxValue-minValue)*0.25, maxValue*0.08, 1);
+    const chartMin = Math.max(0, minValue-padding);
+    const chartMax = maxValue+padding;
+    const range = chartMax-chartMin || 1;
+    const step = (w-left-right)/(valid.length-1);
+
+    function x(i){ return left+i*step; }
+    function y(v){ return h-bottom-((v-chartMin)/range)*(h-top-bottom); }
+
+    const points = valid.map(function(r,i){ return x(i)+','+y(r.consumption); }).join(' ');
+    const dots = valid.map(function(r,i){
+      return '<circle cx="'+x(i)+'" cy="'+y(r.consumption)+'" r="4" fill="#2563eb"><title>'+trNumber.format(r.consumption)+' '+r.consumptionUnit+'</title></circle>';
+    }).join('');
+    const labels = valid.map(function(r,i){
+      const every = Math.max(1,Math.ceil(valid.length/5));
+      if(i%every !== 0 && i !== valid.length-1) return '';
+      return '<text x="'+x(i)+'" y="'+(h-9)+'" text-anchor="middle" font-size="10" fill="#667085">'+formatDate(r.entry.date).slice(0,5)+'</text>';
+    }).join('');
+
+    return '<div class="chart-group">' +
+      '<p class="chart-heading">'+(amountUnit === 'kWh' ? 'Elektrik tüketimi (kWh/100 km)' : 'Yakıt tüketimi (L/100 km)')+'</p>' +
+      '<svg viewBox="0 0 '+w+' '+h+'" width="100%" role="img" aria-label="Tüketim trendi grafiği">' +
+        '<line x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(h-bottom)+'" stroke="#dbe3ee"/>' +
+        '<line x1="'+left+'" y1="'+(h-bottom)+'" x2="'+(w-right)+'" y2="'+(h-bottom)+'" stroke="#dbe3ee"/>' +
+        '<polyline points="'+points+'" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' + dots + labels +
+      '</svg>' +
+    '</div>';
+  }
+
+  function renderChart(rows){
+    const html = renderSingleChart(rows,'L') + renderSingleChart(rows,'kWh');
+    $('chartCard').hidden = !html;
+    $('chartWrap').innerHTML = html;
+  }
+
+  function resultMarkup(r, compact){
+    if(r.consumption !== null){
+      const main = trNumber.format(r.consumption) + ' ' + r.consumptionUnit;
+      const detail = r.distance ? trNumber.format(r.distance) + ' km mesafede' : '';
+      return compact ? main : '<span class="result-ok">'+main+'</span>' + (detail ? '<br><span class="result-note">'+detail+'</span>' : '');
+    }
+    return compact ? r.status : '<span class="result-note">'+esc(r.status)+'</span>';
+  }
+
+  function rowMarkup(r){
+    const e = r.entry;
+    return '<tr>' +
+      '<td>'+formatDate(e.date)+'</td>' +
+      '<td>'+esc(e.fuel)+'</td>' +
+      '<td>'+(e.km === null ? '—' : trNumber.format(e.km))+'</td>' +
+      '<td>'+trNumber.format(e.amount)+' '+r.amountUnit+'</td>' +
+      '<td>'+trMoney.format(e.cost)+' ₺</td>' +
+      '<td>'+trMoney.format(r.unitPrice)+' ₺/'+r.amountUnit+'</td>' +
+      '<td>'+(r.distance === null ? '—' : trNumber.format(r.distance)+' km')+'</td>' +
+      '<td>'+resultMarkup(r,false)+'</td>' +
+      '<td class="desc-cell">'+(e.note ? esc(e.note) : '—')+'</td>' +
+      '<td><div class="row-actions">' +
+        '<button type="button" class="btn btn-edit edit-btn" data-id="'+esc(e.id)+'">Düzenle</button>' +
+        '<button type="button" class="btn btn-danger delete-btn" data-id="'+esc(e.id)+'">Sil</button>' +
+      '</div></td>' +
+    '</tr>';
+  }
+
+  function cardMarkup(r){
+    const e = r.entry;
+    const consumptionClass = r.consumption !== null ? 'consumption-ok' : 'consumption-note';
+    return '<article class="fill-card">' +
+      '<div class="fill-top">' +
+        '<div><div class="fill-date">'+formatDate(e.date)+'</div><span class="fuel-badge">'+esc(e.fuel)+'</span></div>' +
+        '<div class="card-actions">' +
+          '<button type="button" class="btn btn-edit edit-btn" data-id="'+esc(e.id)+'">Düzenle</button>' +
+          '<button type="button" class="btn btn-danger delete-btn" data-id="'+esc(e.id)+'">Sil</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fill-grid">' +
+        '<div class="fill-stat"><span>Araç kilometresi</span><strong>'+(e.km === null ? 'Girilmedi' : trNumber.format(e.km)+' km')+'</strong></div>' +
+        '<div class="fill-stat"><span>Alınan miktar</span><strong>'+trNumber.format(e.amount)+' '+r.amountUnit+'</strong></div>' +
+        '<div class="fill-stat"><span>Toplam tutar</span><strong>'+trMoney.format(e.cost)+' ₺</strong></div>' +
+        '<div class="fill-stat"><span>Birim fiyat</span><strong>'+trMoney.format(r.unitPrice)+' ₺/'+r.amountUnit+'</strong></div>' +
+        '<div class="fill-stat"><span>İki dolum arası</span><strong>'+(r.distance === null ? '—' : trNumber.format(r.distance)+' km')+'</strong></div>' +
+        '<div class="fill-stat"><span>100 km maliyeti</span><strong>'+(r.costPer100 === null ? '—' : trMoney.format(r.costPer100)+' ₺')+'</strong></div>' +
+        '<div class="fill-stat wide '+consumptionClass+'"><span>Tüketim sonucu</span><strong>'+esc(resultMarkup(r,true))+'</strong></div>' +
+      '</div>' +
+      (e.note ? '<p class="fill-desc">'+esc(e.note)+'</p>' : '') +
+    '</article>';
+  }
+
+  function bindHistoryActions(){
+    Array.prototype.forEach.call(document.querySelectorAll('.edit-btn'), function(button){
+      button.addEventListener('click', function(){ startEdit(button.getAttribute('data-id')); });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('.delete-btn'), function(button){
+      button.addEventListener('click', function(){
+        const id = button.getAttribute('data-id');
+        if(!confirm('Bu dolum kaydını silmek istediğinize emin misiniz?')) return;
+
+        entries = entries.filter(function(e){ return e.id !== id; });
+        if(editingId === id) resetForm();
+        saveEntries();
+        render();
+        notify('Kayıt silindi.');
+      });
+    });
+  }
+
+  function renderHistory(rows){
+    if(!entries.length){
+      $('historyArea').innerHTML = '<div class="empty-state"><div class="big">⛽</div><p>Henüz dolum kaydı yok. İlk kaydınızı yukarıdaki formdan ekleyin.</p></div>';
+      return;
+    }
+
+    const reversed = rows.slice().reverse();
+    $('historyArea').innerHTML =
+      '<div class="table-wrap desktop-table"><table><thead><tr>' +
+        '<th>Tarih</th><th>Tür</th><th>Km</th><th>Miktar</th><th>Tutar</th><th>Birim</th><th>Mesafe</th><th>Tüketim</th><th>Açıklama</th><th></th>' +
+      '</tr></thead><tbody>'+reversed.map(rowMarkup).join('')+'</tbody></table></div>' +
+      '<div class="mobile-list">'+reversed.map(cardMarkup).join('')+'</div>';
+
+    bindHistoryActions();
+  }
+
+  function render(){
+    sortEntries();
+    const rows = computeRows();
+    $('recordCount').textContent = entries.length + ' kayıt';
+    renderSummary(rows);
+    renderChart(rows);
+    renderHistory(rows);
+  }
+
+  $('fillForm').addEventListener('submit', function(event){
+    event.preventDefault();
+    const formData = validateAndReadForm();
+    if(!formData) return;
+
+    if(editingId){
+      const index = entries.findIndex(function(e){ return e.id === editingId; });
+      if(index > -1){
+        entries[index] = Object.assign({}, entries[index], formData);
+      }
+    }else{
+      entries.push(Object.assign({id:uid(),createdAt:Date.now()}, formData));
+    }
+
+    sortEntries();
+    if(!saveEntries()) return;
+
+    const wasEditing = !!editingId;
+    const savedFuel = formData.fuel;
+    resetForm(savedFuel);
+    render();
+    notify(wasEditing ? 'Dolum güncellendi.' : 'Dolum kaydedildi.');
+  });
+
+  $('cancelEditButton').addEventListener('click', function(){ resetForm(); });
+  $('f-fuel').addEventListener('change', updateAmountField);
+
+  entries = loadEntries();
+  sortEntries();
+  buildDateFields();
+  if(entries.length) $('f-fuel').value = entries[entries.length-1].fuel;
+  updateAmountField();
+  render();
+})();
+</script>
+
+<script>
+(function(){
+  'use strict';
+  var targetOrigin = 'https://www.arabanekadaryakar.com';
+  var lastHeight = 0;
+  var timer = null;
+
+  function reportHeight(){
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      var body = document.body;
+      var doc = document.documentElement;
+      var height = Math.max(
+        body ? body.scrollHeight : 0,
+        body ? body.offsetHeight : 0,
+        doc ? doc.scrollHeight : 0,
+        doc ? doc.offsetHeight : 0,
+        doc ? doc.clientHeight : 0
+      );
+
+      if(!height || Math.abs(height - lastHeight) < 2) return;
+      lastHeight = height;
+
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({
+          type: 'nky-iframe-height',
+          height: height
+        }, targetOrigin);
+      }
+    }, 60);
+  }
+
+  window.addEventListener('load', reportHeight);
+  window.addEventListener('resize', reportHeight);
+
+  if('ResizeObserver' in window){
+    var observer = new ResizeObserver(reportHeight);
+    observer.observe(document.documentElement);
+    if(document.body) observer.observe(document.body);
+  }else{
+    setInterval(reportHeight, 800);
+  }
+
+  setTimeout(reportHeight, 150);
+  setTimeout(reportHeight, 700);
+  setTimeout(reportHeight, 1600);
+})();
+</script>
+
+</body>
+</html>

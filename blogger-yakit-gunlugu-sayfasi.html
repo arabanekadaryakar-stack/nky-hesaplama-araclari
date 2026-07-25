@@ -1,0 +1,68 @@
+<div class="nky-embedded-page">
+  <p class="nky-page-lead">Dolumlarınızı kaydedin; aylık, yıllık ve toplam harcamanızı ve kilometre bilgisi bulunan kayıtlarda gerçek tüketiminizi takip edin.</p>
+
+  <div class="nky-frame-shell">
+    <iframe
+      id="nkyYakitGunluguFrame"
+      title="Yakıt günlüğü"
+      src="https://arabanekadaryakar-stack.github.io/nky-hesaplama-araclari/yakit-gunlugu/"
+      loading="eager"
+      scrolling="no"
+      allow="clipboard-write; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      style="min-height:1800px">
+    </iframe>
+  </div>
+
+  <section class="nky-page-info">
+    <h2>Yakıt günlüğü nasıl çalışır?</h2>
+    <p>Dolum kayıtları hesabınıza veya uzak bir sunucuya gönderilmez; kullandığınız tarayıcının yerel depolama alanında tutulur.</p>
+<p>Tarayıcı verilerini temizlemek, gizli mod kullanmak veya GitHub araç adresinin değiştirilmesi kayıtlara erişimi etkileyebilir. Tüketim hesabı için aynı yakıt türünde ardışık kilometreli kayıtlar gerekir.</p>
+  </section>
+</div>
+
+
+<style>
+.nky-embedded-page{width:100%;max-width:1120px;margin:0 auto}
+.nky-page-lead{margin:0 0 18px;padding:15px 17px;border:1px solid #cfe0ef;border-left:4px solid #0b5cab;border-radius:13px;background:#f8fbff;color:#40566d;line-height:1.7}
+.nky-frame-shell{width:100%;margin:0 0 22px;overflow:hidden;border:1px solid #dbe3ee;border-radius:18px;background:#f4f7fb}
+.nky-frame-shell iframe{display:block;width:100%;border:0;background:#f4f7fb}
+.nky-page-info{margin-top:20px;padding:20px;border:1px solid #dbe3ee;border-radius:16px;background:#fff}
+.nky-page-info h2{margin:0 0 10px;color:#17365d;font-size:23px}
+.nky-page-info p{margin:0 0 12px;color:#475467;line-height:1.75}
+.nky-page-info p:last-child{margin-bottom:0}
+@media(max-width:680px){
+  .nky-page-lead{padding:13px 14px;font-size:14px}
+  .nky-frame-shell{border-radius:14px}
+  .nky-page-info{padding:15px}
+  .nky-page-info h2{font-size:20px}
+  .nky-page-info p{font-size:14px}
+}
+</style>
+
+
+<style>
+@media(max-width:680px){
+  #nkyYakitGunluguFrame{min-height:2300px!important}
+}
+</style>
+
+<script>
+(function(){
+  var frame = document.getElementById('nkyYakitGunluguFrame');
+  var allowedOrigin = 'https://arabanekadaryakar-stack.github.io';
+  if(!frame) return;
+
+  window.addEventListener('message', function(event){
+    if(event.origin !== allowedOrigin) return;
+    if(event.source !== frame.contentWindow) return;
+    if(!event.data || event.data.type !== 'nky-iframe-height') return;
+
+    var height = parseInt(event.data.height, 10);
+    if(Number.isFinite(height) && height > 300 && height < 15000){
+      frame.style.height = (height + 16) + 'px';
+      frame.style.minHeight = '0';
+    }
+  });
+})();
+</script>
