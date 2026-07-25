@@ -144,6 +144,9 @@ input[type=number]{font-variant-numeric:tabular-nums}
   .nky-native-vehicle-select{font-size:16px;min-height:48px}
 }
 
+
+html,body{max-width:100%;overflow-x:hidden}
+img,svg,canvas,table{max-width:100%}
 </style>
 <meta name="robots" content="noindex,follow">
 <link rel="canonical" href="https://www.arabanekadaryakar.com/p/aylk-yakt-gideri-hesaplama.html">
@@ -390,16 +393,6 @@ window.NKY_LOCATIONS = {
     function close(){panelEl.classList.remove('show');activeIndex=-1;sendHeight();}
     function currentList(){return Array.from(panelEl.querySelectorAll('.nky-suggestion'));}
 
-    // Native datalist is a reliable fallback for browsers that suppress the custom iframe popup.
-    const datalistId=(inputEl.id||'vehicleSearch')+'NativeList';
-    let nativeDatalist=document.getElementById(datalistId);
-    if(!nativeDatalist){
-      nativeDatalist=document.createElement('datalist');
-      nativeDatalist.id=datalistId;
-      inputEl.insertAdjacentElement('afterend',nativeDatalist);
-    }
-    inputEl.setAttribute('list',datalistId);
-
     let nativeWrap=inputEl.parentElement.querySelector('.nky-native-vehicle-wrap');
     let nativeSelect;
     if(!nativeWrap){
@@ -413,7 +406,6 @@ window.NKY_LOCATIONS = {
     function populateNative(){
       const previous=selectedId||nativeSelect.value;
       nativeSelect.innerHTML='<option value="">Araç listesini açın</option>';
-      nativeDatalist.innerHTML='';
       const groups=new Map();
       vehicles.forEach(v=>{
         if(!groups.has(v.brand))groups.set(v.brand,[]);
@@ -427,11 +419,6 @@ window.NKY_LOCATIONS = {
           option.value=v.id;
           option.textContent=v.name+' · '+typeName(v.type)+' · '+fmt(v.cons,1)+' '+v.unit;
           group.appendChild(option);
-
-          const dataOption=document.createElement('option');
-          dataOption.value=v.label;
-          dataOption.label=typeName(v.type)+' · '+fmt(v.cons,1)+' '+v.unit;
-          nativeDatalist.appendChild(dataOption);
         });
         nativeSelect.appendChild(group);
       });
@@ -518,22 +505,7 @@ window.NKY_LOCATIONS = {
 
     inputEl.addEventListener('focus',render);
     inputEl.addEventListener('click',render);
-    inputEl.addEventListener('input',()=>{
-      selectedId='';
-      nativeSelect.value='';
-      const q=normalizeText(inputEl.value);
-      const exact=vehicles.find(v=>normalizeText(v.label)===q);
-      if(exact){
-        applyVehicle(exact,true);
-        return;
-      }
-      render();
-    });
-    inputEl.addEventListener('change',()=>{
-      const q=normalizeText(inputEl.value);
-      const exact=vehicles.find(v=>normalizeText(v.label)===q);
-      if(exact)applyVehicle(exact,true);
-    });
+    inputEl.addEventListener('input',()=>{selectedId='';nativeSelect.value='';render();});
     inputEl.addEventListener('keydown',event=>{
       const list=currentList();
       if(event.key==='Escape'){close();return;}
