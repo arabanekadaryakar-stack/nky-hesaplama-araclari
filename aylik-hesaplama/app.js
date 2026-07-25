@@ -5,11 +5,16 @@
   let lastText='';
   const initialParams=new URLSearchParams(location.search);
   const initialConsumption=N.parseNumber(initialParams.get('consumption'));
+  const initialFuel=N.normalizeFuelType(initialParams.get('fuel'));
+  let useInitialConsumption=N.validPositive(initialConsumption);
   N.fillLocationSelects('priceCity',document.createElement('select'),'Ankara');
   const initialCity=String(initialParams.get('city')||'').trim();
   if(initialCity&&Array.from(N.$('priceCity').options).some(option=>option.value===initialCity))N.$('priceCity').value=initialCity;
   const initialMonthlyKm=N.parseNumber(initialParams.get('monthlyKm'));
   if(N.validPositive(initialMonthlyKm))N.$('monthlyKm').value=N.fmt(initialMonthlyKm,0);
+
+  if(initialParams.get('fuel'))N.$('fuelType').value=initialFuel;
+  if(useInitialConsumption)N.$('consumption').value=N.fmt(initialConsumption,1);
 
   function updateUnits(){
     const electric=N.$('fuelType').value==='elektrik';
@@ -23,7 +28,7 @@
   N.createVehicleAutocomplete({
     input:'vehicleSearch',panel:'vehicleSuggestions',status:'vehicleSelected',
     onSelect(vehicle){
-      selectedVehicle=vehicle;N.$('fuelType').value=vehicle.type;N.$('consumption').value=N.validPositive(initialConsumption)?N.fmt(initialConsumption,1):N.fmt(vehicle.cons,1);updateUnits();
+      selectedVehicle=vehicle;N.$('fuelType').value=vehicle.type;N.$('consumption').value=useInitialConsumption?N.fmt(initialConsumption,1):N.fmt(vehicle.cons,1);useInitialConsumption=false;updateUnits();
       N.$('vehicleSelected').textContent='Seçili araç: '+vehicle.label+' · '+N.typeName(vehicle.type)+' · '+N.fmt(vehicle.cons,1)+' '+vehicle.unit;
       N.$('vehicleSelected').className='nky-selected ok';loadPrice(false);
     }

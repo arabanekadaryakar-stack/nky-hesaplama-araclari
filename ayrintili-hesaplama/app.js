@@ -6,6 +6,8 @@
   let lastRoute=null;
   const initialParams=new URLSearchParams(location.search);
   const initialConsumption=N.parseNumber(initialParams.get('consumption'));
+  const initialFuel=N.normalizeFuelType(initialParams.get('fuel'));
+  let useInitialConsumption=N.validPositive(initialConsumption);
 
   N.fillLocationSelects('fromCity','fromDistrict');
   N.fillLocationSelects('toCity','toDistrict');
@@ -22,6 +24,9 @@
   }
   N.$('fromCity').addEventListener('change',syncPriceCity);
 
+  if(initialParams.get('fuel'))N.$('fuelType').value=initialFuel;
+  if(useInitialConsumption)N.$('consumption').value=N.fmt(initialConsumption,1);
+
   function updateUnits(){
     const electric=N.$('fuelType').value==='elektrik';
     N.$('consumptionUnit').textContent=electric?'kWh/100 km':'L/100 km';
@@ -36,7 +41,7 @@
     onSelect(vehicle){
       selectedVehicle=vehicle;
       N.$('fuelType').value=vehicle.type;
-      N.$('consumption').value=N.validPositive(initialConsumption)?N.fmt(initialConsumption,1):N.fmt(vehicle.cons,1);
+      N.$('consumption').value=useInitialConsumption?N.fmt(initialConsumption,1):N.fmt(vehicle.cons,1);useInitialConsumption=false;
       updateUnits();
       N.$('vehicleSelected').textContent='Seçili araç: '+vehicle.label+' · '+N.typeName(vehicle.type)+' · '+N.fmt(vehicle.cons,1)+' '+vehicle.unit;
       N.$('vehicleSelected').className='nky-selected ok';
