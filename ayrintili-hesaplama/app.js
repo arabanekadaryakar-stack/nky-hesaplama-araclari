@@ -4,10 +4,17 @@
   let selectedVehicle=null;
   let lastResultText='';
   let lastRoute=null;
+  const initialParams=new URLSearchParams(location.search);
+  const initialConsumption=N.parseNumber(initialParams.get('consumption'));
 
   N.fillLocationSelects('fromCity','fromDistrict');
   N.fillLocationSelects('toCity','toDistrict');
   N.fillLocationSelects('priceCity',document.createElement('select'),'Ankara');
+
+  const initialCity=String(initialParams.get('city')||'').trim();
+  if(initialCity&&Array.from(N.$('priceCity').options).some(option=>option.value===initialCity))N.$('priceCity').value=initialCity;
+  const initialDistance=N.parseNumber(initialParams.get('distance'));
+  if(N.validPositive(initialDistance))N.$('distance').value=N.fmt(initialDistance,0);
 
   function syncPriceCity(){
     const from=N.$('fromCity').value;
@@ -29,7 +36,7 @@
     onSelect(vehicle){
       selectedVehicle=vehicle;
       N.$('fuelType').value=vehicle.type;
-      N.$('consumption').value=N.fmt(vehicle.cons,1);
+      N.$('consumption').value=N.validPositive(initialConsumption)?N.fmt(initialConsumption,1):N.fmt(vehicle.cons,1);
       updateUnits();
       N.$('vehicleSelected').textContent='Seçili araç: '+vehicle.label+' · '+N.typeName(vehicle.type)+' · '+N.fmt(vehicle.cons,1)+' '+vehicle.unit;
       N.$('vehicleSelected').className='nky-selected ok';
@@ -126,9 +133,9 @@
 
   N.$('shareButton').addEventListener('click',async()=>{
     if(!lastResultText)return N.showStatus('formError','Önce hesaplama yapın.','error');
-    const result=await N.shareText('Yolculuk maliyeti',lastResultText,'https://www.arabanekadaryakar.com/');
+    const result=await N.shareText('Yolculuk maliyeti',lastResultText,'https://www.arabanekadaryakar.com/p/ayrntl-yakt-maliyeti-hesaplama.html');
     if(result==='copied')N.showStatus('resultNote','Sonuç panoya kopyalandı.','ok');
   });
-  N.$('whatsappButton').addEventListener('click',()=>{if(lastResultText)N.openWhatsApp(lastResultText,'https://www.arabanekadaryakar.com/');});
+  N.$('whatsappButton').addEventListener('click',()=>{if(lastResultText)N.openWhatsApp(lastResultText,'https://www.arabanekadaryakar.com/p/ayrntl-yakt-maliyeti-hesaplama.html');});
   N.$('copyButton').addEventListener('click',async()=>{if(lastResultText){await navigator.clipboard.writeText(lastResultText);N.showStatus('resultNote','Sonuç panoya kopyalandı.','ok');}});
 })();

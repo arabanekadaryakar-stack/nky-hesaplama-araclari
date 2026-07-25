@@ -123,7 +123,7 @@
     return parseNumber(fuel?.benzin);
   }
 
-  function createVehicleAutocomplete({input,panel,onSelect,status,restore=true}){
+  function createVehicleAutocomplete({input,panel,onSelect,status,restore=true,paramName='vehicle',storedKey='nky_last_vehicle'}){
     let vehicles=[];
     let activeIndex=-1;
     const inputEl=typeof input==='string'?$(input):input;
@@ -142,7 +142,7 @@
         button.type='button';button.className='nky-suggestion';button.dataset.id=v.id;
         button.innerHTML='<span class="nky-suggestion-main"><strong>'+escapeHtml(v.label)+'</strong><small>'+escapeHtml(typeName(v.type))+' · '+fmt(v.cons,1)+' '+escapeHtml(v.unit)+'</small></span><span class="nky-badge">Seç</span>';
         button.addEventListener('mousedown',e=>e.preventDefault());
-        button.addEventListener('click',()=>{inputEl.value=v.label;close();onSelect?.(v);setStored('nky_last_vehicle',v);});
+        button.addEventListener('click',()=>{inputEl.value=v.label;close();onSelect?.(v);if(storedKey)setStored(storedKey,v);});
         panelEl.appendChild(button);
       });
       panelEl.classList.add('show');
@@ -165,8 +165,8 @@
       if(status)showStatus(status,'Araç kataloğu hazır: '+vehicles.length+' araç.','ok');
       if(restore){
         const params=new URLSearchParams(location.search);
-        const vehicleParam=params.get('vehicle');
-        const stored=getStored('nky_last_vehicle');
+        const vehicleParam=params.get(paramName);
+        const stored=storedKey?getStored(storedKey):null;
         const candidate=vehicleParam?vehicles.find(x=>normalizeText(x.id)===normalizeText(vehicleParam)||normalizeText(x.label).includes(normalizeText(vehicleParam))):stored&&vehicles.find(x=>x.id===stored.id);
         if(candidate){inputEl.value=candidate.label;onSelect?.(candidate);}
       }

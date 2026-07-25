@@ -3,7 +3,13 @@
   const N=window.NKY;
   let selectedVehicle=null;
   let lastText='';
+  const initialParams=new URLSearchParams(location.search);
+  const initialConsumption=N.parseNumber(initialParams.get('consumption'));
   N.fillLocationSelects('priceCity',document.createElement('select'),'Ankara');
+  const initialCity=String(initialParams.get('city')||'').trim();
+  if(initialCity&&Array.from(N.$('priceCity').options).some(option=>option.value===initialCity))N.$('priceCity').value=initialCity;
+  const initialMonthlyKm=N.parseNumber(initialParams.get('monthlyKm'));
+  if(N.validPositive(initialMonthlyKm))N.$('monthlyKm').value=N.fmt(initialMonthlyKm,0);
 
   function updateUnits(){
     const electric=N.$('fuelType').value==='elektrik';
@@ -17,7 +23,7 @@
   N.createVehicleAutocomplete({
     input:'vehicleSearch',panel:'vehicleSuggestions',status:'vehicleSelected',
     onSelect(vehicle){
-      selectedVehicle=vehicle;N.$('fuelType').value=vehicle.type;N.$('consumption').value=N.fmt(vehicle.cons,1);updateUnits();
+      selectedVehicle=vehicle;N.$('fuelType').value=vehicle.type;N.$('consumption').value=N.validPositive(initialConsumption)?N.fmt(initialConsumption,1):N.fmt(vehicle.cons,1);updateUnits();
       N.$('vehicleSelected').textContent='Seçili araç: '+vehicle.label+' · '+N.typeName(vehicle.type)+' · '+N.fmt(vehicle.cons,1)+' '+vehicle.unit;
       N.$('vehicleSelected').className='nky-selected ok';loadPrice(false);
     }
@@ -57,7 +63,7 @@
   N.$('calculateButton').addEventListener('click',()=>calculate(true));
   document.querySelectorAll('[data-km]').forEach(button=>button.addEventListener('click',()=>{N.$('monthlyKm').value=button.dataset.km;if(N.$('result').classList.contains('show'))calculate(false);}));
 
-  N.$('shareButton').addEventListener('click',async()=>{if(lastText){const r=await N.shareText('Aylık araç gideri',lastText,'https://www.arabanekadaryakar.com/');if(r==='copied')N.showStatus('resultNote','Sonuç panoya kopyalandı.','ok');}});
-  N.$('whatsappButton').addEventListener('click',()=>{if(lastText)N.openWhatsApp(lastText,'https://www.arabanekadaryakar.com/');});
+  N.$('shareButton').addEventListener('click',async()=>{if(lastText){const r=await N.shareText('Aylık araç gideri',lastText,'https://www.arabanekadaryakar.com/p/aylk-yakt-gideri-hesaplama.html');if(r==='copied')N.showStatus('resultNote','Sonuç panoya kopyalandı.','ok');}});
+  N.$('whatsappButton').addEventListener('click',()=>{if(lastText)N.openWhatsApp(lastText,'https://www.arabanekadaryakar.com/p/aylk-yakt-gideri-hesaplama.html');});
   N.$('copyButton').addEventListener('click',async()=>{if(lastText){await navigator.clipboard.writeText(lastText);N.showStatus('resultNote','Sonuç panoya kopyalandı.','ok');}});
 })();

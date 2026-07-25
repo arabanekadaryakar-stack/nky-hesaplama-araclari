@@ -6,10 +6,13 @@
   let routeKm=0;
   let routeLabel='';
   let lastText='';
+  const initialParams=new URLSearchParams(location.search);
 
   N.fillLocationSelects('fromCity','fromDistrict');
   N.fillLocationSelects('toCity','toDistrict');
   N.fillLocationSelects('priceCity',document.createElement('select'),'Ankara');
+  const initialCity=String(initialParams.get('city')||'').trim();
+  if(initialCity&&Array.from(N.$('priceCity').options).some(option=>option.value===initialCity))N.$('priceCity').value=initialCity;
 
   function selectVehicle(slot,vehicle){
     selected[slot]=vehicle;
@@ -21,8 +24,8 @@
     N.$('selected'+i).className='nky-selected ok';
     if(selected[0]&&selected[1])loadPrices(false);
   }
-  N.createVehicleAutocomplete({input:'vehicle1',panel:'suggestions1',status:'selected1',restore:false,onSelect:v=>selectVehicle(0,v)});
-  N.createVehicleAutocomplete({input:'vehicle2',panel:'suggestions2',status:'selected2',restore:false,onSelect:v=>selectVehicle(1,v)});
+  N.createVehicleAutocomplete({input:'vehicle1',panel:'suggestions1',status:'selected1',restore:true,paramName:'vehicle1',storedKey:null,onSelect:v=>selectVehicle(0,v)});
+  N.createVehicleAutocomplete({input:'vehicle2',panel:'suggestions2',status:'selected2',restore:true,paramName:'vehicle2',storedKey:null,onSelect:v=>selectVehicle(1,v)});
 
   document.querySelectorAll('.nky-tab').forEach(button=>button.addEventListener('click',()=>{
     mode=button.dataset.mode;
@@ -30,6 +33,13 @@
     document.querySelectorAll('.nky-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===mode));
     N.sendHeight();
   }));
+
+  const initialDistance=N.parseNumber(initialParams.get('distance'));
+  if(N.validPositive(initialDistance)){
+    N.$('distanceKm').value=N.fmt(initialDistance,0);
+    const distanceTab=document.querySelector('.nky-tab[data-mode="distance"]');
+    if(distanceTab)distanceTab.click();
+  }
 
   N.$('fromCity').addEventListener('change',()=>{if(N.$('fromCity').value)N.$('priceCity').value=N.$('fromCity').value;});
   N.$('routeButton').addEventListener('click',async()=>{
@@ -95,7 +105,7 @@
     N.$('result').classList.add('show');N.$('result').scrollIntoView({behavior:'smooth',block:'start'});N.sendHeight();
   });
 
-  N.$('shareButton').addEventListener('click',async()=>{if(lastText){const r=await N.shareText('Araç karşılaştırması',lastText,'https://www.arabanekadaryakar.com/');if(r==='copied')N.showStatus('difference','Karşılaştırma sonucu panoya kopyalandı.','ok');}});
-  N.$('whatsappButton').addEventListener('click',()=>{if(lastText)N.openWhatsApp(lastText,'https://www.arabanekadaryakar.com/');});
+  N.$('shareButton').addEventListener('click',async()=>{if(lastText){const r=await N.shareText('Araç karşılaştırması',lastText,'https://www.arabanekadaryakar.com/p/iki-aracn-yakt-maliyetini-karslastr.html');if(r==='copied')N.showStatus('difference','Karşılaştırma sonucu panoya kopyalandı.','ok');}});
+  N.$('whatsappButton').addEventListener('click',()=>{if(lastText)N.openWhatsApp(lastText,'https://www.arabanekadaryakar.com/p/iki-aracn-yakt-maliyetini-karslastr.html');});
   N.$('copyButton').addEventListener('click',async()=>{if(lastText){await navigator.clipboard.writeText(lastText);N.showStatus('difference','Karşılaştırma sonucu panoya kopyalandı.','ok');}});
 })();
